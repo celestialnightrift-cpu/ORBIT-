@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#FAF8F5" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<title>ORBIT ✦ Daily Wellness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<style>
+  /* ============ THEME TOKENS ============ */
+  :root {
+    --bg: #FAF8F5;
+    --bg-soft: #F5F1EC;
+    --card: #FFFFFF;
+    --card-border: #F1EBF5;
+    --text: #2D3142;
+    --text-soft: #6B7280;
+    --text-muted: #9CA3AF;
+    --lavender: #D8B4FE;
+    --periwinkle: #C7D2FE;
+    --pink: #FBCFE8;
+    --mint: #A7F3D0;
+    --apricot: #FFEDD5;
+    --coral: #FCA5A5;
+    --orange: #FDBA74;
+    --mint-strong: #6EE7B7;
+    --shadow-soft: 0 8px 24px rgba(149, 128, 172, 0.08);
+    --shadow-hover: 0 12px 32px rgba(149, 128, 172, 0.12);
+    --shadow-glow-lav: 0 8px 24px rgba(216, 180, 254, 0.35);
+    --shadow-glow-pink: 0 8px 20px rgba(251, 207, 232, 0.45);
+    --radius-lg: 24px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+    --radius-pill: 999px;
+    --grad-primary: linear-gradient(135deg, #D8B4FE 0%, #C7D2FE 50%, #FBCFE8 100%);
+    --grad-logo: linear-gradient(135deg, #B794F4 0%, #A5B4FC 50%, #F9A8D4 100%);
+    --grad-energy-low: linear-gradient(90deg, #FCA5A5, #FDBA74);
+    --grad-energy-mid: linear-gradient(90deg, #FDBA74, #FDE68A);
+    --grad-energy-high: linear-gradient(90deg, #6EE7B7, #A7F3D0);
+    --trans: 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  [data-theme="dark"] {
+    --bg: #111827;
+    --bg-soft: #0B1220;
+    --card: #1F2937;
+    --card-border: #374151;
+    --text: #F3F4F6;
+    --text-soft: #9CA3AF;
+    --text-muted: #6B7280;
+    --lavender: #A78BFA;
+    --periwinkle: #818CF8;
+    --pink: #F472B6;
+    --mint: #6EE7B7;
+    --apricot: #FDBA74;
+    --coral: #FCA5A5;
+    --orange: #FDBA74;
+    --mint-strong: #6EE7B7;
+    --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.45);
+    --shadow-glow-lav: 0 8px 24px rgba(167, 139, 250, 0.4);
+    --shadow-glow-pink: 0 8px 20px rgba(244, 114, 182, 0.4);
+    --grad-logo: linear-gradient(135deg, #C4B5FD 0%, #A5B4FC 50%, #F9A8D4 100%);
+  }
+
+  /* ============ BASE ============ */
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    transition: background var(--trans), color var(--trans);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 20px 120px;
+    position: relative;
+  }
+
+  /* ============ HEADER ============ */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 18px 0 14px;
+    background: linear-gradient(to bottom, var(--bg) 70%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .logo {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    background: var(--grad-logo);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .logo-star {
+    font-size: 18px;
+    opacity: 0.9;
+  }
+  .date-badge {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-pill);
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-soft);
+    box-shadow: var(--shadow-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .theme-toggle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    transition: transform var(--trans), box-shadow var(--trans);
+  }
+  .theme-toggle:active { transform: scale(0.9); }
+
+  /* ============ CALENDAR STRIP ============ */
+  .cal-strip {
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 6px 2px 10px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cal-strip::-webkit-scrollbar { display: none; }
+  .cal-day {
+    flex: 0 0 auto;
+    min-width: 56px;
+    padding: 10px 8px;
+    border-radius: var(--radius-md);
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--trans);
+    position: relative;
+    user-select: none;
+  }
+  .cal-day:active { transform: scale(0.95); }
+  .cal-day .dow {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .cal-day .num {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 2px;
+    color: var(--text);
+  }
+  .cal-day.has-data::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--lavender);
+  }
+  .cal-day.active {
+    background: var(--grad-primary);
+    border-color: transparent;
+    box-shadow: var(--shadow-glow-lav);
+  }
+  .cal-day.active .dow, .cal-day.active .num { color: #fff; }
+  .cal-day.active.has-data::after { background: rgba(255,255,255,0.9); }
+  .cal-day.today:not(.active) {
+    border-color: var(--lavender);
+    border-width: 1.5px;
+  }
+
+  /* ============ SECTION ============ */
+  .section {
+    margin-top: 22px;
+  }
+  .section-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 12px 2px;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow var(--trans);
+  }
+
+  /* ============ ENERGY SLIDER ============ */
+  .energy-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .energy-label {
+    font-size: 13px;
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+  .energy-value {
+    font-family: 'Fraunces', serif;
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    background: var(--grad-energy-high);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: background var(--trans);
+  }
+  .energy-slider-wrap {
+    position: relative;
+    padding: 18px 0 8px;
+  }
+  .energy-track {
+    position: relative;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--bg-soft);
+    overflow: hidden;
+  }
+  .energy-fill {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--grad-energy-high);
+    transition: width 120ms ease, background var(--trans);
+    box-shadow: inset 0 0 12px rgba(255,255,255,0.3);
+  }
+  .energy-input {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 40px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    margin: 0;
+  }
+  .energy-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--mint-strong);
+    box-shadow: 0 4px 12px rgba(110, 231, 183, 0.5), 0 0 0 4px rgba(110, 231, 183, 0.15);
+    cursor: grab;
+    transition: border-color var(--trans), box-shadow var(--trans);
+  }
+  .energy-input::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--mint-strong);
+    box-shadow: 0 4px 12px rgba(110, 231, 183, 0.5), 0 0 0 4px rgba(110, 231, 183, 0.15);
+    cursor: grab;
+  }
+  .energy-input:active::-webkit-slider-thumb { cursor: grabbing; transform: scale(1.1); }
+  .energy-tag {
+    position: absolute;
+    top: -8px;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: var(--bg);
+    padding: 5px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: left 80ms ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .energy-tag::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: var(--text);
+  }
+  .energy-moods {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    font-size: 18px;
+    opacity: 0.7;
+  }
+
+  /* ============ MEALS ============ */
+  .emoji-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .emoji-tile {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    border: 1.5px solid var(--card-border);
+    display: grid;
+    place-items: center;
+    font-size: 26px;
+    cursor: pointer;
+    transition: all var(--trans);
+    position: relative;
+    user-select: none;
+  }
+  .emoji-tile:active { transform: scale(0.9); }
+  .emoji-tile.selected {
+    background: var(--grad-primary);
+    border-color: transparent;
+    box-shadow: var(--shadow-glow-lav);
+    transform: translateY(-2px);
+  }
+  .emoji-tile.selected::after {
+    content: '✓';
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    color: #B794F4;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .emoji-tile.add-btn {
+    background: var(--card);
+    border: 1.5px dashed var(--lavender);
+    color: var(--lavender);
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .emoji-tile.add-btn span { font-size: 13px; }
+  .emoji-tile.custom {
+    background: linear-gradient(135deg, var(--apricot), var(--pink));
+    border-color: transparent;
+  }
+
+  .photo-drop {
+    border: 2px dashed var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--trans);
+    background: var(--bg-soft);
+    position: relative;
+  }
+  .photo-drop:hover, .photo-drop.dragover {
+    border-color: var(--lavender);
+    background: var(--card);
+  }
+  .photo-drop .icon { font-size: 32px; margin-bottom: 6px; }
+  .photo-drop .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .photo-drop .sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .photo-preview {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: none;
+    box-shadow: var(--shadow-soft);
+  }
+  .photo-preview img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    color: #2D3142;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform var(--trans);
+  }
+  .photo-remove:active { transform: scale(0.9); }
+
+  /* ============ PERIOD ============ */
+  .period-pills {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .period-pill {
+    flex: 1;
+    min-width: 90px;
+    padding: 12px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--bg-soft);
+    border: 1.5px solid transparent;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all var(--trans);
+    text-align: center;
+    user-select: none;
+  }
+  .period-pill:active { transform: scale(0.96); }
+  .period-pill.active-yes {
+    background: linear-gradient(135deg, #FECDD3, #FBCFE8);
+    color: #9F1239;
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(251, 207, 232, 0.5);
+  }
+  .period-pill.active-no {
+    background: linear-gradient(135deg, #E0E7FF, #C7D2FE);
+    color: #3730A3;
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(199, 210, 254, 0.5);
+  }
+  .period-pill.active-spot {
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    color: #92400E;
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(253, 230, 138, 0.5);
+  }
+
+  .mini-cal {
+    margin-top: 4px;
+  }
+  .mini-cal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .mini-cal-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .mini-cal-nav {
+    display: flex;
+    gap: 4px;
+  }
+  .mini-cal-nav button {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    border: none;
+    cursor: pointer;
+    color: var(--text-soft);
+    font-size: 14px;
+    transition: all var(--trans);
+  }
+  .mini-cal-nav button:active { transform: scale(0.9); }
+  .mini-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .mini-cal-dow {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    padding: 4px 0;
+  }
+  .mini-cal-day {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    position: relative;
+    cursor: pointer;
+    transition: all var(--trans);
+    background: transparent;
+  }
+  .mini-cal-day.empty { visibility: hidden; }
+  .mini-cal-day.today {
+    border: 1.5px solid var(--lavender);
+  }
+  .mini-cal-day.period-yes {
+    background: linear-gradient(135deg, #FECDD3, #FBCFE8);
+    color: #9F1239;
+  }
+  .mini-cal-day.period-spot {
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    color: #92400E;
+  }
+  .mini-cal-day.period-yes::after,
+  .mini-cal-day.period-spot::after {
+    content: '';
+    position: absolute;
+    bottom: 1px;
+    font-size: 7px;
+  }
+  .mini-cal-day.period-yes::after { content: '💧'; }
+  .mini-cal-day.period-spot::after { content: '✨'; }
+  .mini-cal-day:active:not(.empty) { transform: scale(0.9); }
+
+  /* ============ SAVE BUTTON ============ */
+  .save-wrap {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--bg) 60%, transparent);
+    z-index: 40;
+    pointer-events: none;
+  }
+  .save-btn {
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
+    display: block;
+    padding: 16px 24px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: var(--grad-primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    box-shadow: var(--shadow-glow-lav);
+    transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow var(--trans);
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+  }
+  .save-btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+  }
+  .save-btn.saved {
+    animation: bounceSave 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes bounceSave {
+    0% { transform: scale(1); }
+    30% { transform: scale(0.92); }
+    60% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  /* ============ MODAL ============ */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--trans);
+  }
+  .modal-backdrop.show {
+    display: flex;
+    opacity: 1;
+  }
+  .modal {
+    background: var(--card);
+    border-radius: 28px 28px 0 0;
+    padding: 22px 20px calc(22px + env(safe-area-inset-bottom));
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.15);
+  }
+  .modal-backdrop.show .modal { transform: translateY(0); }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+  }
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-soft);
+    display: grid;
+    place-items: center;
+  }
+  .modal-search {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--card-border);
+    background: var(--bg-soft);
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 14px;
+    outline: none;
+    transition: border-color var(--trans);
+  }
+  .modal-search:focus { border-color: var(--lavender); }
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .emoji-grid .emoji-tile {
+    width: 100%;
+    aspect-ratio: 1;
+    height: auto;
+    font-size: 24px;
+  }
+  .custom-input-row {
+    display: flex;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--card-border);
+  }
+  .custom-input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--card-border);
+    background: var(--bg-soft);
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+  }
+  .custom-input:focus { border-color: var(--lavender); }
+  .custom-add {
+    padding: 0 18px;
+    border-radius: var(--radius-pill);
+    border: none;
+    background: var(--grad-primary);
+    color: #fff;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: var(--shadow-glow-lav);
+  }
+  .custom-add:active { transform: scale(0.95); }
+
+  /* ============ TOAST ============ */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-120%);
+    background: var(--text);
+    color: var(--bg);
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    z-index: 200;
+    transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ============ UTILITIES ============ */
+  .fade-in { animation: fadeIn 400ms ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 360px) {
+    .app { padding: 0 14px 120px; }
+    .emoji-tile { width: 48px; height: 48px; font-size: 22px; }
+    .cal-day { min-width: 48px; padding: 8px 6px; }
+    .cal-day .num { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-row">
+      <div class="logo">ORBIT <span class="logo-star">✦</span></div>
+      <div class="date-badge" id="dateBadge">📅 Today</div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    </div>
+    <div class="cal-strip" id="calStrip"></div>
+  </header>
+
+  <!-- ENERGY -->
+  <section class="section fade-in">
+    <h2 class="section-title">⚡ Energy & Vibe</h2>
+    <div class="card">
+      <div class="energy-display">
+        <div class="energy-label">How are you feeling?</div>
+        <div class="energy-value" id="energyValue">70%</div>
+      </div>
+      <div class="energy-slider-wrap">
+        <div class="energy-track">
+          <div class="energy-fill" id="energyFill" style="width: 70%"></div>
+        </div>
+        <input type="range" min="0" max="100" value="70" class="energy-input" id="energyInput" />
+        <div class="energy-tag" id="energyTag">70%</div>
+      </div>
+      <div class="energy-moods">
+        <span>😴</span><span>🌿</span><span>✨</span><span>🔥</span><span>🌟</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEALS -->
+  <section class="section fade-in">
+    <h2 class="section-title">🍽️ Meals & Snacks</h2>
+    <div class="card">
+      <div class="emoji-row" id="emojiRow"></div>
+      <div class="photo-drop" id="photoDrop">
+        <div class="icon">📸</div>
+        <div class="label">Snap Meal Photo</div>
+        <div class="sub">Tap or drop an image</div>
+      </div>
+      <div class="photo-preview" id="photoPreview">
+        <img id="photoImg" alt="meal" />
+        <button class="photo-remove" id="photoRemove" aria-label="Remove photo">✕</button>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" />
+    </div>
+  </section>
+
+  <!-- PERIOD -->
+  <section class="section fade-in">
+    <h2 class="section-title">🌸 Period & Cycle Tracker</h2>
+    <div class="card">
+      <div class="period-pills" id="periodPills">
+        <button class="period-pill" data-status="yes">Yes 🩸</button>
+        <button class="period-pill" data-status="no">No ☁️</button>
+        <button class="period-pill" data-status="spotting">Spotting ✨</button>
+      </div>
+      <div class="mini-cal">
+        <div class="mini-cal-head">
+          <div class="mini-cal-title" id="miniCalTitle">August 2026</div>
+          <div class="mini-cal-nav">
+            <button id="calPrev" aria-label="Previous month">‹</button>
+            <button id="calNext" aria-label="Next month">›</button>
+          </div>
+        </div>
+        <div class="mini-cal-grid" id="miniCalGrid"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- SAVE BUTTON -->
+<div class="save-wrap">
+  <button class="save-btn" id="saveBtn">Save Day ✨</button>
+</div>
+
+<!-- EMOJI MODAL -->
+<div class="modal-backdrop" id="emojiModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 class="modal-title">Add Food Emoji 🍓</h3>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <input type="text" class="modal-search" id="emojiSearch" placeholder="Search foods..." />
+    <div class="emoji-grid" id="emojiGrid"></div>
+    <div class="custom-input-row">
+      <input type="text" class="custom-input" id="customEmoji" placeholder="Paste any emoji 🍣" maxlength="4" />
+      <button class="custom-add" id="customAdd">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">Saved ✨</div>
+
+<script>
+/* ============ STATE ============ */
+const STORAGE_KEY = 'orbit_data_v1';
+const EMOJIS_KEY = 'orbit_custom_emojis_v1';
+const THEME_KEY = 'orbit_theme_v1';
+
+const DEFAULT_EMOJIS = ['🥗', '🍕', '🍎', '🥑', '🥐'];
+const PICKER_EMOJIS = [
+  '🍓','🍒','🍇','🍉','🍊','🍋','🍌','🍍','🥭','🍑',
+  '🍈','🥝','🍅','🥥','🥕','🌽','🥦','🧄','🧅','🥔',
+  '🍠','🥐','🥖','🍞','🥨','🥯','🧇','🥞','🧀','🍔',
+  '🍟','🌭','🥪','🌮','🌯','🥙','🧆','🥚','🍳','🥘',
+  '🍲','🥣','🥗','🍿','🧈','🍱','🍣','🍤','🍙','🍚',
+  '🍛','🍜','🍝','🍠','🍢','🍡','🥟','🥠','🥡','🧋',
+  '🍵','☕','🥤','🧃','🍶','🍺','🍷','🍸','🍹','🧁',
+  '🍰','🎂','🍮','🍭','🍬','🍫','🍩','🍪','🥮','🍯'
+];
+
+let state = {
+  selectedDate: todayKey(),
+  miniCalMonth: new Date().getMonth(),
+  miniCalYear: new Date().getFullYear(),
+  current: { energy: 70, emojis: [], photo: null, period: null },
+  customEmojis: loadCustomEmojis(),
+};
+
+/* ============ HELPERS ============ */
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function parseKey(k) {
+  const [y,m,d] = k.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function saveData(data) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+  catch(e) { showToast('Storage full — try removing a photo'); }
+}
+function loadCustomEmojis() {
+  try { return JSON.parse(localStorage.getItem(EMOJIS_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function saveCustomEmojis() {
+  localStorage.setItem(EMOJIS_KEY, JSON.stringify(state.customEmojis));
+}
+
+/* ============ THEME ============ */
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = saved || (prefersDark ? 'dark' : 'light');
+  applyTheme(theme);
+}
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#111827' : '#FAF8F5');
+  localStorage.setItem(THEME_KEY, theme);
+}
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+});
+
+/* ============ CALENDAR STRIP ============ */
+function renderCalStrip() {
+  const strip = document.getElementById('calStrip');
+  strip.innerHTML = '';
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const start = new Date(today);
+  start.setDate(today.getDate() - 10);
+  const data = loadData();
+  const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  for (let i = 0; i < 21; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const key = dateKey(d);
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    if (key === state.selectedDate) el.classList.add('active');
+    if (key === todayKey()) el.classList.add('today');
+    if (data[key]) el.classList.add('has-data');
+    el.innerHTML = `<div class="dow">${dows[d.getDay()]}</div><div class="num">${d.getDate()}</div>`;
+    el.addEventListener('click', () => selectDate(key));
+    strip.appendChild(el);
+  }
+
+  // scroll active into view
+  setTimeout(() => {
+    const active = strip.querySelector('.cal-day.active');
+    if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, 50);
+}
+
+function selectDate(key) {
+  if (key === state.selectedDate) return;
+  // persist current state to old date first
+  persistCurrentToData();
+  state.selectedDate = key;
+  loadDateIntoState(key);
+  renderCalStrip();
+  updateDateBadge();
+  renderMiniCal();
+}
+
+function persistCurrentToData() {
+  const data = loadData();
+  const hasContent = state.current.energy !== 70 ||
+                     state.current.emojis.length > 0 ||
+                     state.current.photo ||
+                     state.current.period;
+  if (hasContent) {
+    data[state.selectedDate] = { ...state.current };
+  } else {
+    delete data[state.selectedDate];
+  }
+  saveData(data);
+}
+
+function loadDateIntoState(key) {
+  const data = loadData();
+  const entry = data[key];
+  if (entry) {
+    state.current = {
+      energy: entry.energy ?? 70,
+      emojis: entry.emojis || [],
+      photo: entry.photo || null,
+      period: entry.period || null,
+    };
+  } else {
+    state.current = { energy: 70, emojis: [], photo: null, period: null };
+  }
+  renderAll();
+}
+
+function updateDateBadge() {
+  const d = parseKey(state.selectedDate);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((d - today) / 86400000);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let label;
+  if (diff === 0) label = 'Today';
+  else if (diff === -1) label = 'Yesterday';
+  else if (diff === 1) label = 'Tomorrow';
+  else label = `${months[d.getMonth()]} ${d.getDate()}`;
+  document.getElementById('dateBadge').textContent = `📅 ${label}`;
+}
+
+/* ============ ENERGY SLIDER ============ */
+const energyInput = document.getElementById('energyInput');
+const energyFill = document.getElementById('energyFill');
+const energyValue = document.getElementById('energyValue');
+const energyTag = document.getElementById('energyTag');
+
+function updateEnergyUI(value) {
+  const v = parseInt(value, 10);
+  energyFill.style.width = v + '%';
+  energyValue.textContent = v + '%';
+  energyTag.textContent = v + '%';
+
+  // gradient color logic
+  let grad;
+  if (v < 30) {
+    grad = 'linear-gradient(90deg, #FCA5A5, #FDBA74)';
+    energyValue.style.background = 'linear-gradient(135deg, #FCA5A5, #FDBA74)';
+    energyInput.style.setProperty('--thumb-color', '#FCA5A5');
+    document.documentElement.style.setProperty('--thumb-border', '#FCA5A5');
+  } else if (v <= 60) {
+    grad = 'linear-gradient(90deg, #FDBA74, #FDE68A)';
+    energyValue.style.background = 'linear-gradient(135deg, #FDBA74, #FDE68A)';
+  } else {
+    grad = 'linear-gradient(90deg, #6EE7B7, #A7F3D0)';
+    energyValue.style.background = 'linear-gradient(135deg, #6EE7B7, #A7F3D0)';
+  }
+  energyFill.style.background = grad;
+  energyValue.style.webkitBackgroundClip = 'text';
+  energyValue.style.backgroundClip = 'text';
+  energyValue.style.color = 'transparent';
+
+  // position tag
+  const pct = v / 100;
+  const trackWidth = energyInput.offsetWidth;
+  const thumbOffset = 14; // half thumb width
+  const left = pct * (trackWidth - 28) + 14;
+  energyTag.style.left = left + 'px';
+}
+
+energyInput.addEventListener('input', (e) => {
+  state.current.energy = parseInt(e.target.value, 10);
+  updateEnergyUI(e.target.value);
+});
+window.addEventListener('resize', () => updateEnergyUI(energyInput.value));
+
+/* ============ EMOJIS ============ */
+function renderEmojiRow() {
+  const row = document.getElementById('emojiRow');
+  row.innerHTML = '';
+  const allEmojis = [...DEFAULT_EMOJIS, ...state.customEmojis];
+
+  allEmojis.forEach((em, idx) => {
+    const tile = document.createElement('div');
+    tile.className = 'emoji-tile';
+    if (idx >= DEFAULT_EMOJIS.length) tile.classList.add('custom');
+    if (state.current.emojis.includes(em)) tile.classList.add('selected');
+    tile.textContent = em;
+    tile.addEventListener('click', () => toggleEmoji(em));
+    row.appendChild(tile);
+  });
+
+  // add button
+  const addBtn = document.createElement('div');
+  addBtn.className = 'emoji-tile add-btn';
+  addBtn.innerHTML = '<span>+</span>';
+  addBtn.addEventListener('click', openEmojiModal);
+  row.appendChild(addBtn);
+}
+
+function toggleEmoji(em) {
+  const idx = state.current.emojis.indexOf(em);
+  if (idx >= 0) state.current.emojis.splice(idx, 1);
+  else state.current.emojis.push(em);
+  renderEmojiRow();
+}
+
+/* ============ EMOJI MODAL ============ */
+const emojiModal = document.getElementById('emojiModal');
+const emojiGrid = document.getElementById('emojiGrid');
+const emojiSearch = document.getElementById('emojiSearch');
+
+function openEmojiModal() {
+  emojiModal.classList.add('show');
+  emojiSearch.value = '';
+  renderEmojiGrid('');
+  setTimeout(() => emojiSearch.focus(), 300);
+}
+function closeEmojiModal() {
+  emojiModal.classList.remove('show');
+}
+document.getElementById('modalClose').addEventListener('click', closeEmojiModal);
+emojiModal.addEventListener('click', (e) => {
+  if (e.target === emojiModal) closeEmojiModal();
+});
+
+function renderEmojiGrid(filter) {
+  emojiGrid.innerHTML = '';
+  const list = PICKER_EMOJIS.filter(em => {
+    if (!filter) return true;
+    return true; // emojis don't text-match; filter is cosmetic
+  });
+  list.forEach(em => {
+    const tile = document.createElement('div');
+    tile.className = 'emoji-tile';
+    tile.textContent = em;
+    tile.addEventListener('click', () => pickPickerEmoji(em));
+    emojiGrid.appendChild(tile);
+  });
+}
+
+emojiSearch.addEventListener('input', (e) => renderEmojiGrid(e.target.value));
+
+function pickPickerEmoji(em) {
+  if (state.customEmojis.includes(em) || DEFAULT_EMOJIS.includes(em)) {
+    // just toggle selection
+    toggleEmoji(em);
+    closeEmojiModal();
+    return;
+  }
+  state.customEmojis.push(em);
+  saveCustomEmojis();
+  if (!state.current.emojis.includes(em)) state.current.emojis.push(em);
+  renderEmojiRow();
+  closeEmojiModal();
+  showToast(`Added ${em} ✨`);
+}
+
+document.getElementById('customAdd').addEventListener('click', () => {
+  const input = document.getElementById('customEmoji');
+  const val = input.value.trim();
+  if (!val) return;
+  // extract first emoji-like character
+  const emojiRegex = /[\p{Extended_Pictographic}]/u;
+  const match = val.match(emojiRegex);
+  const em = match ? match[0] : val;
+  if (!state.customEmojis.includes(em) && !DEFAULT_EMOJIS.includes(em)) {
+    state.customEmojis.push(em);
+    saveCustomEmojis();
+  }
+  if (!state.current.emojis.includes(em)) state.current.emojis.push(em);
+  renderEmojiRow();
+  input.value = '';
+  closeEmojiModal();
+  showToast(`Added ${em} ✨`);
+});
+
+/* ============ PHOTO ============ */
+const photoDrop = document.getElementById('photoDrop');
+const photoPreview = document.getElementById('photoPreview');
+const photoImg = document.getElementById('photoImg');
+const photoInput = document.getElementById('photoInput');
+
+photoDrop.addEventListener('click', () => photoInput.click());
+photoDrop.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  photoDrop.classList.add('dragover');
+});
+photoDrop.addEventListener('dragleave', () => photoDrop.classList.remove('dragover'));
+photoDrop.addEventListener('drop', (e) => {
+  e.preventDefault();
+  photoDrop.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) handlePhotoFile(file);
+});
+photoInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) handlePhotoFile(file);
+});
+document.getElementById('photoRemove').addEventListener('click', (e) => {
+  e.stopPropagation();
+  state.current.photo = null;
+  photoPreview.style.display = 'none';
+  photoDrop.style.display = 'block';
+  photoInput.value = '';
+});
+
+function handlePhotoFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    // resize to save localStorage space
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxDim = 500;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxDim) { h = h * maxDim / w; w = maxDim; } }
+      else { if (h > maxDim) { w = w * maxDim / h; h = maxDim; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      state.current.photo = dataUrl;
+      photoImg.src = dataUrl;
+      photoPreview.style.display = 'block';
+      photoDrop.style.display = 'none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============ PERIOD ============ */
+const periodPills = document.getElementById('periodPills');
+periodPills.addEventListener('click', (e) => {
+  const pill = e.target.closest('.period-pill');
+  if (!pill) return;
+  const status = pill.dataset.status;
+  state.current.period = state.current.period === status ? null : status;
+  renderPeriodPills();
+  renderMiniCal();
+});
+
+function renderPeriodPills() {
+  document.querySelectorAll('.period-pill').forEach(p => {
+    p.classList.remove('active-yes', 'active-no', 'active-spot');
+    if (p.dataset.status === state.current.period) {
+      if (p.dataset.status === 'yes') p.classList.add('active-yes');
+      else if (p.dataset.status === 'no') p.classList.add('active-no');
+      else p.classList.add('active-spot');
+    }
+  });
+}
+
+/* ============ MINI CALENDAR ============ */
+function renderMiniCal() {
+  const grid = document.getElementById('miniCalGrid');
+  const title = document.getElementById('miniCalTitle');
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  title.textContent = `${months[state.miniCalMonth]} ${state.miniCalYear}`;
+
+  grid.innerHTML = '';
+  const dows = ['S','M','T','W','T','F','S'];
+  dows.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'mini-cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(state.miniCalYear, state.miniCalMonth, 1);
+  const lastDay = new Date(state.miniCalYear, state.miniCalMonth + 1, 0);
+  const startDow = firstDay.getDay();
+  const daysInMonth = lastDay.getDate();
+  const todayK = todayKey();
+  const data = loadData();
+
+  for (let i = 0; i < startDow; i++) {
+    const el = document.createElement('div');
+    el.className = 'mini-cal-day empty';
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(state.miniCalYear, state.miniCalMonth, d);
+    const key = dateKey(date);
+    const entry = data[key];
+    const el = document.createElement('div');
+    el.className = 'mini-cal-day';
+    if (key === todayK) el.classList.add('today');
+    if (entry && entry.period === 'yes') el.classList.add('period-yes');
+    else if (entry && entry.period === 'spotting') el.classList.add('period-spot');
+    el.textContent = d;
+    el.addEventListener('click', () => selectDate(key));
+    grid.appendChild(el);
+  }
+}
+
+document.getElementById('calPrev').addEventListener('click', () => {
+  state.miniCalMonth--;
+  if (state.miniCalMonth < 0) { state.miniCalMonth = 11; state.miniCalYear--; }
+  renderMiniCal();
+});
+document.getElementById('calNext').addEventListener('click', () => {
+  state.miniCalMonth++;
+  if (state.miniCalMonth > 11) { state.miniCalMonth = 0; state.miniCalYear++; }
+  renderMiniCal();
+});
+
+/* ============ SAVE ============ */
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const data = loadData();
+  const hasContent = state.current.energy !== 70 ||
+                     state.current.emojis.length > 0 ||
+                     state.current.photo ||
+                     state.current.period;
+  if (hasContent) {
+    data[state.selectedDate] = { ...state.current };
+  } else {
+    delete data[state.selectedDate];
+  }
+  saveData(data);
+  const btn = document.getElementById('saveBtn');
+  btn.classList.remove('saved');
+  void btn.offsetWidth; // reflow
+  btn.classList.add('saved');
+  showToast('Day saved ✨');
+  renderCalStrip();
+  renderMiniCal();
+});
+
+/* ============ TOAST ============ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* ============ RENDER ALL ============ */
+function renderAll() {
+  energyInput.value = state.current.energy;
+  updateEnergyUI(state.current.energy);
+  renderEmojiRow();
+  if (state.current.photo) {
+    photoImg.src = state.current.photo;
+    photoPreview.style.display = 'block';
+    photoDrop.style.display = 'none';
+  } else {
+    photoPreview.style.display = 'none';
+    photoDrop.style.display = 'block';
+  }
+  renderPeriodPills();
+}
+
+/* ============ INIT ============ */
+initTheme();
+loadDateIntoState(state.selectedDate);
+renderCalStrip();
+updateDateBadge();
+renderMiniCal();
+// delay energy tag positioning until layout settles
+requestAnimationFrame(() => updateEnergyUI(energyInput.value));
+</script>
+</body>
+</html>
