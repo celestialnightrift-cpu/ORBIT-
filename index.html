@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GlowCare & Self-Care Studio 🌸</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            blush: '#FFD1DC',
+            blushDark: '#FF99AC',
+            sage: '#E2EFDA',
+            sageDark: '#93C47D',
+            lavender: '#E6E6FA',
+            lavenderDark: '#B3B3ED',
+            cream: '#FFFDD0',
+            charcoal: '#2D3748',
+          },
+          fontFamily: {
+            sans: ['Nunito', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #FFF5F7; color: #2D3748; }
+    .tab-btn.active { background-color: #FFD1DC; font-weight: 800; transform: translateY(-2px); }
+    .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); border: 2px solid #FFE4E8; }
+    .water-fill { transition: height 0.5s ease-in-out; }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #FFF5F7; }
+    ::-webkit-scrollbar-thumb { background: #FFD1DC; border-radius: 10px; }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col pb-20 md:pb-6">
+
+  <header class="bg-white/90 backdrop-blur border-b border-pink-100 sticky top-0 z-30 px-4 py-3 shadow-sm">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🌸</span>
+        <h1 class="text-xl font-black text-pink-600 tracking-wide">GlowCare Studio</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="exportData()" class="px-3 py-1 text-xs font-bold bg-pink-100 hover:bg-pink-200 text-pink-700 rounded-full transition">📤 Export JSON</button>
+        <label class="px-3 py-1 text-xs font-bold bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full cursor-pointer transition">
+          📥 Import JSON <input type="file" onchange="importData(event)" class="hidden" accept=".json"/>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <nav class="bg-white border-b border-pink-100 px-2 py-2 sticky top-[57px] z-20 shadow-xs overflow-x-auto">
+    <div class="max-w-6xl mx-auto flex gap-2 min-w-max justify-center">
+      <button onclick="switchTab('period')" id="tab-period" class="tab-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">🩸 Period Calendar</button>
+      <button onclick="switchTab('recipes')" id="tab-recipes" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">🥑 Recipes & Macros</button>
+      <button onclick="switchTab('chores')" id="tab-chores" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">🧹 Cleansing To-Do</button>
+      <button onclick="switchTab('routines')" id="tab-routines" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">🎁 30-Day Routines</button>
+      <button onclick="switchTab('sleep')" id="tab-sleep" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">🌙 Sleep Tracker</button>
+      <button onclick="switchTab('water')" id="tab-water" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">💧 Hydration</button>
+      <button onclick="switchTab('reward')" id="tab-reward" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">✨ Daily Reward</button>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto w-full p-4 flex-grow">
+
+    <section id="mod-period" class="space-y-6">
+      <div class="glass-card p-6 rounded-3xl shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-2xl font-black text-gray-800 flex items-center gap-2">🩸 Menstrual Cycle Calendar</h2>
+            <p class="text-xs text-gray-500">Track cycle, predict ovulation, and log daily symptoms</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="cycle-phase-badge" class="px-4 py-1.5 bg-pink-200 text-pink-800 text-xs font-extrabold rounded-full">Phase: Menstrual 🩸</span>
+            <span id="cycle-countdown" class="px-4 py-1.5 bg-lavender text-purple-800 text-xs font-extrabold rounded-full">Next Period: ~14 Days</span>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center bg-pink-50/80 p-3 rounded-2xl mb-4">
+          <button onclick="changeMonth(-1)" class="px-3 py-1 font-black bg-white rounded-xl shadow-xs hover:bg-pink-100">❮ Prev</button>
+          <h3 id="calendar-month-year" class="text-base font-extrabold text-pink-700">August 2026</h3>
+          <button onclick="changeMonth(1)" class="px-3 py-1 font-black bg-white rounded-xl shadow-xs hover:bg-pink-100">Next ❯</button>
+        </div>
+
+        <div class="grid grid-cols-7 gap-1 text-center font-bold text-xs text-gray-400 mb-2">
+          <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+        </div>
+        <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
+      </div>
+    </section>
+
+    <section id="mod-recipes" class="space-y-6 hidden">
+      <div class="glass-card p-5 rounded-3xl space-y-4">
+        <h2 class="text-xl font-black text-gray-800 flex items-center gap-2">🥑 Daily Macro & Micro Summary</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div class="bg-amber-50 p-3 rounded-2xl border border-amber-100">
+            <div class="text-xs text-amber-600 font-extrabold">Calories</div>
+            <div id="macro-cal" class="text-lg font-black text-amber-800">0 / 2000 kcal</div>
+          </div>
+          <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100">
+            <div class="text-xs text-blue-600 font-extrabold">Carbs</div>
+            <div id="macro-carbs" class="text-lg font-black text-blue-800">0 / 250 g</div>
+          </div>
+          <div class="bg-rose-50 p-3 rounded-2xl border border-rose-100">
+            <div class="text-xs text-rose-600 font-extrabold">Fats</div>
+            <div id="macro-fats" class="text-lg font-black text-rose-800">0 / 65 g</div>
+          </div>
+          <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-100">
+            <div class="text-xs text-emerald-600 font-extrabold">Protein</div>
+            <div id="macro-protein" class="text-lg font-black text-emerald-800">0 / 80 g</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 text-center text-xs">
+          <div class="bg-purple-50 p-2 rounded-xl">Fe: <span id="micro-iron">0</span>/18mg</div>
+          <div class="bg-purple-50 p-2 rounded-xl">Ca: <span id="micro-calcium">0</span>/1000mg</div>
+          <div class="bg-purple-50 p-2 rounded-xl">Vit C: <span id="micro-vitc">0</span>/75mg</div>
+          <div class="bg-purple-50 p-2 rounded-xl">Mg: <span id="micro-mag">0</span>/310mg</div>
+          <div class="bg-purple-50 p-2 rounded-xl">Vit D: <span id="micro-vitd">0</span>/600IU</div>
+        </div>
+      </div>
+
+      <div class="glass-card p-5 rounded-3xl space-y-3">
+        <h3 class="text-base font-black text-gray-800">🍳 Add New Recipe</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <input id="rcp-name" type="text" placeholder="Recipe Name (e.g. Berry Smoothie Bowl)" class="px-3 py-2 rounded-xl border border-pink-200 text-xs focus:outline-pink-400">
+          <input id="rcp-ing" type="text" placeholder="Ingredients (comma separated)" class="px-3 py-2 rounded-xl border border-pink-200 text-xs focus:outline-pink-400">
+          <input id="rcp-inst" type="text" placeholder="Instructions summary" class="px-3 py-2 rounded-xl border border-pink-200 text-xs focus:outline-pink-400">
+        </div>
+        <div class="grid grid-cols-3 sm:grid-cols-9 gap-2">
+          <input id="rcp-cal" type="number" placeholder="Kcal" class="px-2 py-1.5 rounded-xl border border-pink-200 text-xs">
+          <input id="rcp-carbs" type="number" placeholder="Carbs(g)" class="px-2 py-1.5 rounded-xl border border-pink-200 text-xs">
+          <input id="rcp-fats" type="number" placeholder="Fats(g)" class="px-2 py-1.5 rounded-xl border border-pink-200 text-xs">
+          <input id="rcp-protein" type="number" placeholder="Prot(g)" class="px-2 py-1.5 rounded-xl border border-pink-200 text-xs">
+          <input id="rcp-iron" type="number" placeholder="Fe(mg)" class="px-2 py-1.5 rounded-xl border border-pink-200 text-xs">
+          <input id="rcp-calcium" type="number" placeholder="Ca(mg)" class="px-2 py-1.5 rounded-xl border border-pink-200 text-xs">
+          <input id="rcp-vitc" type="number" placeholder="VitC(mg)" class="px-2 py-1.5 rounded-xl border border-pink-200 text-xs">
+          <input id="rcp-mag" type="number" placeholder="Mg(mg)" class="px-2 py-1.5 rounded-xl border border-pink-200 text-xs">
+          <input id="rcp-vitd" type="number" placeholder="VitD(IU)" class="px-2 py-1.5 rounded-xl border border-pink-200 text-xs">
+        </div>
+        <button onclick="addRecipe()" class="w-full py-2 bg-pink-400 hover:bg-pink-500 text-white font-extrabold rounded-xl text-xs transition">Save Recipe ✨</button>
+      </div>
+
+      <div id="recipe-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <section id="mod-chores" class="space-y-6 hidden">
+      <div class="glass-card p-6 rounded-3xl space-y-4">
+        <div class="flex justify-between items-center">
+          <h2 class="text-2xl font-black text-gray-800">🧹 Cleansing & Chores To-Do</h2>
+          <div class="text-xs font-black text-pink-600" id="chore-progress-text">0% Completed</div>
+        </div>
+
+        <div class="w-full bg-pink-100 h-3 rounded-full overflow-hidden">
+          <div id="chore-progress-bar" class="bg-pink-400 h-full w-0 transition-all duration-300"></div>
+        </div>
+
+        <div class="flex gap-2 border-b border-pink-100 pb-2">
+          <button onclick="switchChoreTab('daily')" id="ctab-daily" class="px-4 py-1.5 rounded-xl text-xs font-black bg-pink-200 text-pink-800">Daily Chores</button>
+          <button onclick="switchChoreTab('monthly')" id="ctab-monthly" class="px-4 py-1.5 rounded-xl text-xs font-black bg-gray-100 text-gray-600">Monthly Deep Clean</button>
+          <button onclick="switchChoreTab('yearly')" id="ctab-yearly" class="px-4 py-1.5 rounded-xl text-xs font-black bg-gray-100 text-gray-600">Yearly Declutter</button>
+        </div>
+
+        <div class="flex gap-2">
+          <input id="chore-input" type="text" placeholder="Add a new task..." class="flex-grow px-4 py-2 rounded-xl border border-pink-200 text-xs focus:outline-pink-400">
+          <button onclick="addChore()" class="px-5 py-2 bg-pink-400 hover:bg-pink-500 text-white text-xs font-bold rounded-xl transition">Add ✔️</button>
+        </div>
+
+        <div id="chore-items-list" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <section id="mod-reward" class="space-y-6 hidden">
+      <div class="glass-card p-8 rounded-3xl text-center space-y-6 max-w-xl mx-auto border-4 border-pink-200">
+        <div class="text-5xl">✨🎁✨</div>
+        <h2 class="text-2xl font-black text-pink-700">Daily Self-Care Reward</h2>
+        <p class="text-xs text-gray-500">Check off your daily tasks or routines to reveal today's special gift!</p>
+
+        <div id="reward-locked" class="p-6 bg-pink-50 rounded-2xl border border-pink-200 space-y-2">
+          <div class="text-3xl">🔒</div>
+          <p class="text-xs font-bold text-gray-600">Locked! Complete all daily routines or chores to open your reward card.</p>
+          <button onclick="unlockRewardOverride()" class="text-[10px] text-pink-400 underline">Dev unlock override</button>
+        </div>
+
+        <div id="reward-unlocked" class="hidden p-6 bg-gradient-to-br from-pink-100 via-purple-50 to-amber-50 rounded-2xl border-2 border-pink-300 space-y-4 text-left shadow-inner">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 bg-white text-pink-600 text-xs font-black rounded-full shadow-xs">💬 Quote of the Day</span>
+            <span class="text-xs font-black text-purple-600">Badge Earned: 🏆 Glow Princess</span>
+          </div>
+          <blockquote id="reward-quote" class="italic text-sm font-bold text-gray-700 bg-white/60 p-3 rounded-xl border-l-4 border-pink-400">
+            "Self-care is how you take your power back."
+          </blockquote>
+          <div class="space-y-1 bg-white/70 p-4 rounded-xl border border-purple-100">
+            <div class="text-xs font-extrabold text-purple-700 flex items-center gap-1">📚 Curated Book Recommendation</div>
+            <div id="reward-book-title" class="font-black text-sm text-gray-800">Atomic Habits by James Clear</div>
+            <p id="reward-book-desc" class="text-xs text-gray-600">A supreme guide on building cute, sustainable habits 1% every single day.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="mod-routines" class="space-y-6 hidden">
+      <div class="glass-card p-6 rounded-3xl space-y-4">
+        <div class="flex flex-wrap justify-between items-center gap-2">
+          <div>
+            <h2 class="text-2xl font-black text-gray-800">🎁 30-Day Routine Box Cards</h2>
+            <p class="text-xs text-gray-500">Check all 5 daily self-care tasks on a card to close & tie the gift box!</p>
+          </div>
+          <span class="text-xs font-extrabold bg-pink-100 text-pink-700 px-3 py-1 rounded-full">Current Year: 2026</span>
+        </div>
+
+        <div id="routine-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </section>
+
+    <section id="mod-sleep" class="space-y-6 hidden">
+      <div class="glass-card p-6 rounded-3xl space-y-6 max-w-xl mx-auto">
+        <h2 class="text-2xl font-black text-gray-800 flex items-center gap-2">🌙 Sleep & Wake-Up Logger</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-purple-50 p-4 rounded-2xl border border-purple-100 space-y-1">
+            <label class="text-xs font-black text-purple-700 block">Bedtime (PM)</label>
+            <input id="sleep-bed" type="time" value="22:30" onchange="calcSleep()" class="w-full bg-white px-3 py-2 rounded-xl text-sm font-bold border border-purple-200">
+          </div>
+          <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100 space-y-1">
+            <label class="text-xs font-black text-amber-700 block">Wake-Up Time (AM)</label>
+            <input id="sleep-wake" type="time" value="07:00" onchange="calcSleep()" class="w-full bg-white px-3 py-2 rounded-xl text-sm font-bold border border-amber-200">
+          </div>
+        </div>
+
+        <div class="bg-pink-100 p-4 rounded-2xl text-center space-y-1">
+          <span class="text-xs font-extrabold text-pink-600 uppercase tracking-wider">Total Calculated Duration</span>
+          <div id="sleep-duration-text" class="text-3xl font-black text-pink-800">8 hrs 30 mins</div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-xs font-black text-gray-700 block">Sleep Quality Rating</label>
+          <div class="flex justify-around bg-gray-50 p-3 rounded-2xl">
+            <button onclick="setSleepQuality('😴 Rested')" class="px-3 py-1.5 rounded-xl hover:bg-pink-100 text-xs font-bold transition">😴 Rested</button>
+            <button onclick="setSleepQuality('🥱 Tired')" class="px-3 py-1.5 rounded-xl hover:bg-pink-100 text-xs font-bold transition">🥱 Tired</button>
+            <button onclick="setSleepQuality('⚡ Energized')" class="px-3 py-1.5 rounded-xl hover:bg-pink-100 text-xs font-bold transition">⚡ Energized</button>
+          </div>
+          <p id="sleep-quality-status" class="text-xs text-center font-bold text-purple-600 mt-2">Logged Quality: 😴 Rested</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="mod-water" class="space-y-6 hidden">
+      <div class="glass-card p-6 rounded-3xl space-y-6 max-w-md mx-auto text-center">
+        <h2 class="text-2xl font-black text-gray-800 flex items-center justify-center gap-2">💧 Hydration Tracker</h2>
+
+        <div class="relative w-32 h-64 mx-auto border-4 border-blue-300 rounded-b-3xl rounded-t-xl overflow-hidden bg-blue-50 shadow-inner flex flex-col justify-end">
+          <div id="water-level-bar" class="water-fill bg-blue-400/80 w-full" style="height: 40%;"></div>
+          <span id="water-percent-text" class="absolute inset-0 flex items-center justify-center text-lg font-black text-blue-900 drop-shadow-sm">40%</span>
+        </div>
+
+        <div class="space-y-1">
+          <div id="water-val-text" class="text-2xl font-black text-blue-800">1000 / 2500 ml</div>
+          <p class="text-xs text-gray-500 font-bold">Daily Goal: 2500 ml</p>
+        </div>
+
+        <div class="flex justify-center gap-3">
+          <button onclick="addWater(250)" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-extrabold text-xs rounded-xl transition">+250ml 🥛</button>
+          <button onclick="addWater(500)" class="px-4 py-2 bg-blue-200 hover:bg-blue-300 text-blue-800 font-extrabold text-xs rounded-xl transition">+500ml 💧</button>
+          <button onclick="addWater(1000)" class="px-4 py-2 bg-blue-400 hover:bg-blue-500 text-white font-extrabold text-xs rounded-xl transition">+1000ml 🍾</button>
+        </div>
+        <button onclick="resetWater()" class="text-[10px] text-gray-400 hover:underline">Reset Daily Counter</button>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="period-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white p-6 rounded-3xl max-w-sm w-full space-y-4 shadow-xl border-2 border-pink-200">
+      <div class="flex justify-between items-center">
+        <h3 id="modal-date-title" class="text-base font-black text-gray-800">Log Symptoms</h3>
+        <button onclick="closePeriodModal()" class="text-gray-400 hover:text-gray-600 font-black">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <label class="flex items-center justify-between text-xs font-bold text-gray-700 p-2 bg-pink-50 rounded-xl">
+          <span>Active Period Day? 🩸</span>
+          <input type="checkbox" id="modal-period-toggle" class="w-4 h-4 accent-pink-500">
+        </label>
+
+        <div>
+          <label class="text-xs font-bold text-gray-600 block mb-1">Flow Intensity</label>
+          <select id="modal-flow" class="w-full text-xs p-2 rounded-xl border border-pink-200">
+            <option value="Light 💧">Light 💧</option>
+            <option value="Medium 💧💧">Medium 💧💧</option>
+            <option value="Heavy 🩸">Heavy 🩸</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-gray-600 block mb-1">Daily Symptoms</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center gap-1.5"><input type="checkbox" class="symptom-cb" value="Cramps"> Cramps 😣</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" class="symptom-cb" value="Acne"> Acne 🧼</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" class="symptom-cb" value="Low Energy"> Low Energy 🥱</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" class="symptom-cb" value="Cravings"> Cravings 🍫</label>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="savePeriodDateLog()" class="w-full py-2 bg-pink-400 hover:bg-pink-500 text-white font-extrabold rounded-xl text-xs transition">Save Log ✨</button>
+    </div>
+  </div>
+
+  <script>
+    // --- APP STATE DATA STRUCTURE ---
+    let defaultState = {
+      calendar: {
+        activeYear: 2026,
+        activeMonth: 7, // 0-indexed: 7 = August 2026
+        periodDates: ['2026-08-01', '2026-08-02', '2026-08-03', '2026-08-04'],
+        logs: {}
+      },
+      recipes: [
+        {
+          id: 1, name: 'Coquette Berry Bowl 🍓',
+          ingredients: 'Acai, Frozen Berries, Almond Milk, Chia Seeds',
+          instructions: 'Blend berries with milk. Top with chia seeds and strawberry slices.',
+          cal: 320, carbs: 45, fats: 8, protein: 12, iron: 3, calcium: 150, vitc: 45, mag: 60, vitd: 0
+        }
+      ],
+      choresTab: 'daily',
+      chores: {
+        daily: [
+          { id: 1, text: 'Make bed cleanly 🛏️', done: true },
+          { id: 2, text: 'Wipe bathroom counter 🧼', done: false }
+        ],
+        monthly: [{ id: 3, text: 'Wash bedroom curtains 🧺', done: false }],
+        yearly: [{ id: 4, text: 'Wardrobe declutter 👗', done: false }]
+      },
+      routines: {}, // day1: { face: true, hair: true, body: true, shower: true, reading: true }
+      sleep: { bed: '22:30', wake: '07:00', quality: '😴 Rested' },
+      water: { current: 1000, goal: 2500 }
+    };
+
+    let appState = JSON.parse(localStorage.getItem('glowcare_data')) || defaultState;
+
+    function saveState() {
+      localStorage.setItem('glowcare_data', JSON.stringify(appState));
+    }
+
+    // --- TAB SWITCHER ---
+    function switchTab(tabKey) {
+      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('mod-' + tabKey).classList.remove('hidden');
+      document.getElementById('tab-' + tabKey).classList.add('active');
+    }
+
+    // --- MODULE 1: CALENDAR LOGIC ---
+    let selectedModalDateStr = '';
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+
+      const y = appState.calendar.activeYear;
+      const m = appState.calendar.activeMonth;
+
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      document.getElementById('calendar-month-year').innerText = `${monthNames[m]} ${y}`;
+
+      const firstDay = new Date(y, m, 1).getDay();
+      const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+      // Blank slots
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement('div');
+        grid.appendChild(emptyCell);
+      }
+
+      // Day slots
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isPeriod = appState.calendar.periodDates.includes(dateStr);
+        const isOvulation = (day >= 12 && day <= 16); // Simple indicator for demo
+
+        const cell = document.createElement('div');
+        cell.className = `p-2 min-h-[50px] rounded-2xl text-xs font-extrabold flex flex-col justify-between cursor-pointer border transition ${
+          isPeriod ? 'bg-pink-300 border-pink-400 text-pink-900 shadow-xs' : 
+          isOvulation ? 'bg-lavender border-purple-300 text-purple-900' : 
+          'bg-white border-pink-100 hover:bg-pink-50 text-gray-700'
+        }`;
+        
+        cell.onclick = () => openPeriodModal(dateStr);
+
+        cell.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span>${day}</span>
+            ${isPeriod ? '🩸' : isOvulation ? '🌸' : ''}
+          </div>
+        `;
+        grid.appendChild(cell);
+      }
+    }
+
+    function changeMonth(delta) {
+      appState.calendar.activeMonth += delta;
+      if (appState.calendar.activeMonth > 11) {
+        appState.calendar.activeMonth = 0;
+        appState.calendar.activeYear++;
+      } else if (appState.calendar.activeMonth < 0) {
+        appState.calendar.activeMonth = 11;
+        appState.calendar.activeYear--;
+      }
+      saveState();
+      renderCalendar();
+    }
+
+    function openPeriodModal(dateStr) {
+      selectedModalDateStr = dateStr;
+      document.getElementById('modal-date-title').innerText = `Log for ${dateStr}`;
+      const isPeriod = appState.calendar.periodDates.includes(dateStr);
+      document.getElementById('modal-period-toggle').checked = isPeriod;
+      document.getElementById('period-modal').classList.remove('hidden');
+    }
+
+    function closePeriodModal() {
+      document.getElementById('period-modal').classList.add('hidden');
+    }
+
+    function savePeriodDateLog() {
+      const isChecked = document.getElementById('modal-period-toggle').checked;
+      const idx = appState.calendar.periodDates.indexOf(selectedModalDateStr);
+      if (isChecked && idx === -1) {
+        appState.calendar.periodDates.push(selectedModalDateStr);
+      } else if (!isChecked && idx !== -1) {
+        appState.calendar.periodDates.splice(idx, 1);
+      }
+      saveState();
+      renderCalendar();
+      closePeriodModal();
+    }
+
+    // --- MODULE 2: RECIPE LOGIC ---
+    function renderRecipes() {
+      const list = document.getElementById('recipe-list');
+      list.innerHTML = '';
+
+      let totalCal = 0, totalCarbs = 0, totalFats = 0, totalProt = 0;
+      let totalFe = 0, totalCa = 0, totalVitC = 0, totalMg = 0, totalVitD = 0;
+
+      appState.recipes.forEach((rcp) => {
+        totalCal += Number(rcp.cal || 0);
+        totalCarbs += Number(rcp.carbs || 0);
+        totalFats += Number(rcp.fats || 0);
+        totalProt += Number(rcp.protein || 0);
+        totalFe += Number(rcp.iron || 0);
+        totalCa += Number(rcp.calcium || 0);
+        totalVitC += Number(rcp.vitc || 0);
+        totalMg += Number(rcp.mag || 0);
+        totalVitD += Number(rcp.vitd || 0);
+
+        const card = document.createElement('div');
+        card.className = "bg-white p-4 rounded-2xl border border-pink-100 shadow-xs space-y-2";
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <h4 class="font-extrabold text-sm text-gray-800">${rcp.name}</h4>
+            <button onclick="deleteRecipe(${rcp.id})" class="text-xs text-red-400 hover:text-red-600">✕</button>
+          </div>
+          <p class="text-xs text-pink-600 font-bold">🛒 Ingredients: ${rcp.ingredients}</p>
+          <p class="text-xs text-gray-600">📝 ${rcp.instructions}</p>
+          <div class="flex flex-wrap gap-2 text-[10px] font-black text-gray-500 pt-1 border-t border-gray-100">
+            <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md">${rcp.cal} kcal</span>
+            <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md">C: ${rcp.carbs}g</span>
+            <span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-md">F: ${rcp.fats}g</span>
+            <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md">P: ${rcp.protein}g</span>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      // Update Summary Header
+      document.getElementById('macro-cal').innerText = `${totalCal} / 2000 kcal`;
+      document.getElementById('macro-carbs').innerText = `${totalCarbs} / 250 g`;
+      document.getElementById('macro-fats').innerText = `${totalFats} / 65 g`;
+      document.getElementById('macro-protein').innerText = `${totalProt} / 80 g`;
+
+      document.getElementById('micro-iron').innerText = totalFe;
+      document.getElementById('micro-calcium').innerText = totalCa;
+      document.getElementById('micro-vitc').innerText = totalVitC;
+      document.getElementById('micro-mag').innerText = totalMg;
+      document.getElementById('micro-vitd').innerText = totalVitD;
+    }
+
+    function addRecipe() {
+      const name = document.getElementById('rcp-name').value;
+      if (!name) return;
+
+      const newRcp = {
+        id: Date.now(),
+        name: name,
+        ingredients: document.getElementById('rcp-ing').value || 'N/A',
+        instructions: document.getElementById('rcp-inst').value || 'N/A',
+        cal: document.getElementById('rcp-cal').value || 0,
+        carbs: document.getElementById('rcp-carbs').value || 0,
+        fats: document.getElementById('rcp-fats').value || 0,
+        protein: document.getElementById('rcp-protein').value || 0,
+        iron: document.getElementById('rcp-iron').value || 0,
+        calcium: document.getElementById('rcp-calcium').value || 0,
+        vitc: document.getElementById('rcp-vitc').value || 0,
+        mag: document.getElementById('rcp-mag').value || 0,
+        vitd: document.getElementById('rcp-vitd').value || 0,
+      };
+
+      appState.recipes.push(newRcp);
+      saveState();
+      renderRecipes();
+
+      // Clear inputs
+      ['rcp-name', 'rcp-ing', 'rcp-inst', 'rcp-cal', 'rcp-carbs', 'rcp-fats', 'rcp-protein', 'rcp-iron', 'rcp-calcium', 'rcp-vitc', 'rcp-mag', 'rcp-vitd'].forEach(id => document.getElementById(id).value = '');
+    }
+
+    function deleteRecipe(id) {
+      appState.recipes = appState.recipes.filter(r => r.id !== id);
+      saveState();
+      renderRecipes();
+    }
+
+    // --- MODULE 3: CHORES LOGIC ---
+    function switchChoreTab(tabKey) {
+      appState.choresTab = tabKey;
+      ['daily', 'monthly', 'yearly'].forEach(k => {
+        const btn = document.getElementById('ctab-' + k);
+        if (k === tabKey) {
+          btn.className = "px-4 py-1.5 rounded-xl text-xs font-black bg-pink-200 text-pink-800";
+        } else {
+          btn.className = "px-4 py-1.5 rounded-xl text-xs font-black bg-gray-100 text-gray-600";
+        }
+      });
+      renderChores();
+    }
+
+    function renderChores() {
+      const container = document.getElementById('chore-items-list');
+      container.innerHTML = '';
+      const list = appState.chores[appState.choresTab] || [];
+
+      let completedCount = 0;
+      list.forEach(item => {
+        if (item.done) completedCount++;
+
+        const div = document.createElement('div');
+        div.className = "flex items-center justify-between p-3 bg-white rounded-xl border border-pink-100";
+        div.innerHTML = `
+          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold ${item.done ? 'line-through text-gray-400' : 'text-gray-700'}">
+            <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleChore(${item.id})" class="w-4 h-4 accent-pink-400">
+            ${item.text}
+          </label>
+          <button onclick="deleteChore(${item.id})" class="text-xs text-red-300 hover:text-red-500 font-black">✕</button>
+        `;
+        container.appendChild(div);
+      });
+
+      const pct = list.length ? Math.round((completedCount / list.length) * 100) : 0;
+      document.getElementById('chore-progress-bar').style.width = pct + '%';
+      document.getElementById('chore-progress-text').innerText = pct + '% Completed';
+
+      checkRewardUnlockStatus();
+    }
+
+    function addChore() {
+      const input = document.getElementById('chore-input');
+      if (!input.value) return;
+      appState.chores[appState.choresTab].push({
+        id: Date.now(),
+        text: input.value,
+        done: false
+      });
+      input.value = '';
+      saveState();
+      renderChores();
+    }
+
+    function toggleChore(id) {
+      const item = appState.chores[appState.choresTab].find(i => i.id === id);
+      if (item) item.done = !item.done;
+      saveState();
+      renderChores();
+    }
+
+    function deleteChore(id) {
+      appState.chores[appState.choresTab] = appState.chores[appState.choresTab].filter(i => i.id !== id);
+      saveState();
+      renderChores();
+    }
+
+    // --- MODULE 4: GAMIFIED REWARD LOGIC ---
+    function checkRewardUnlockStatus() {
+      const dailyTasks = appState.chores.daily;
+      const allDone = dailyTasks.length > 0 && dailyTasks.every(t => t.done);
+
+      if (allDone) {
+        document.getElementById('reward-locked').classList.add('hidden');
+        document.getElementById('reward-unlocked').classList.remove('hidden');
+      }
+    }
+
+    function unlockRewardOverride() {
+      document.getElementById('reward-locked').classList.add('hidden');
+      document.getElementById('reward-unlocked').classList.remove('hidden');
+    }
+
+    // --- MODULE 5: 30-DAY ROUTINE CARDS ---
+    function renderRoutines() {
+      const grid = document.getElementById('routine-cards-grid');
+      grid.innerHTML = '';
+
+      for (let day = 1; day <= 30; day++) {
+        const dayKey = 'day' + day;
+        if (!appState.routines[dayKey]) {
+          appState.routines[dayKey] = { face: false, hair: false, body: false, shower: false, reading: false };
+        }
+
+        const r = appState.routines[dayKey];
+        const isComplete = r.face && r.hair && r.body && r.shower && r.reading;
+
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-3xl border-2 transition-all ${
+          isComplete ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900 shadow-sm' : 'bg-white/90 border-pink-200'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex justify-between items-center mb-3">
+            <div class="font-black text-sm">Day ${day} <span class="text-[10px] text-gray-400 font-normal">(Aug ${day}, 2026)</span></div>
+            ${isComplete ? '<span class="text-xs bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-black">🎁 Closed Box</span>' : '<span class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full font-black">📦 Open Box</span>'}
+          </div>
+
+          ${isComplete ? `
+            <div class="text-center py-6 space-y-2">
+              <div class="text-4xl">🎁✨</div>
+              <div class="text-xs font-black text-emerald-700">All Routines Complete! Box Closed!</div>
+              <button onclick="resetDayRoutine('${dayKey}')" class="text-[10px] text-emerald-500 underline">Unseal Box</button>
+            </div>
+          ` : `
+            <div class="space-y-1.5 text-xs font-bold text-gray-700">
+              <label class="flex items-center justify-between p-1.5 bg-pink-50/60 rounded-xl cursor-pointer">
+                <span>🧴 Face Skincare</span>
+                <input type="checkbox" ${r.face ? 'checked' : ''} onchange="toggleRoutine('${dayKey}', 'face')" class="accent-pink-400">
+              </label>
+              <label class="flex items-center justify-between p-1.5 bg-pink-50/60 rounded-xl cursor-pointer">
+                <span>💇‍♀️ Haircare</span>
+                <input type="checkbox" ${r.hair ? 'checked' : ''} onchange="toggleRoutine('${dayKey}', 'hair')" class="accent-pink-400">
+              </label>
+              <label class="flex items-center justify-between p-1.5 bg-pink-50/60 rounded-xl cursor-pointer">
+                <span>🧼 Bodycare</span>
+                <input type="checkbox" ${r.body ? 'checked' : ''} onchange="toggleRoutine('${dayKey}', 'body')" class="accent-pink-400">
+              </label>
+              <label class="flex items-center justify-between p-1.5 bg-pink-50/60 rounded-xl cursor-pointer">
+                <span>🚿 Shower Routine</span>
+                <input type="checkbox" ${r.shower ? 'checked' : ''} onchange="toggleRoutine('${dayKey}', 'shower')" class="accent-pink-400">
+              </label>
+              <label class="flex items-center justify-between p-1.5 bg-pink-50/60 rounded-xl cursor-pointer">
+                <span>📚 Daily Reading</span>
+                <input type="checkbox" ${r.reading ? 'checked' : ''} onchange="toggleRoutine('${dayKey}', 'reading')" class="accent-pink-400">
+              </label>
+            </div>
+          `}
+        `;
+        grid.appendChild(card);
+      }
+    }
+
+    function toggleRoutine(dayKey, field) {
+      appState.routines[dayKey][field] = !appState.routines[dayKey][field];
+      saveState();
+      renderRoutines();
+    }
+
+    function resetDayRoutine(dayKey) {
+      appState.routines[dayKey] = { face: false, hair: false, body: false, shower: false, reading: false };
+      saveState();
+      renderRoutines();
+    }
+
+    // --- MODULE 6: SLEEP LOGIC ---
+    function calcSleep() {
+      const bed = document.getElementById('sleep-bed').value;
+      const wake = document.getElementById('sleep-wake').value;
+      if (!bed || !wake) return;
+
+      const [bH, bM] = bed.split(':').map(Number);
+      const [wH, wM] = wake.split(':').map(Number);
+
+      let bDate = new Date(2026, 0, 1, bH, bM);
+      let wDate = new Date(2026, 0, (wH < bH || (wH === bH && wM < bM)) ? 2 : 1, wH, wM);
+
+      let diffMinutes = Math.floor((wDate - bDate) / (1000 * 60));
+      let hrs = Math.floor(diffMinutes / 60);
+      let mins = diffMinutes % 60;
+
+      document.getElementById('sleep-duration-text').innerText = `${hrs} hrs ${mins} mins`;
+      appState.sleep.bed = bed;
+      appState.sleep.wake = wake;
+      saveState();
+    }
+
+    function setSleepQuality(qual) {
+      appState.sleep.quality = qual;
+      document.getElementById('sleep-quality-status').innerText = `Logged Quality: ${qual}`;
+      saveState();
+    }
+
+    // --- MODULE 7: WATER LOGIC ---
+    function updateWaterUI() {
+      const pct = Math.min(100, Math.round((appState.water.current / appState.water.goal) * 100));
+      document.getElementById('water-level-bar').style.height = pct + '%';
+      document.getElementById('water-percent-text').innerText = pct + '%';
+      document.getElementById('water-val-text').innerText = `${appState.water.current} / ${appState.water.goal} ml`;
+    }
+
+    function addWater(amount) {
+      appState.water.current += amount;
+      saveState();
+      updateWaterUI();
+    }
+
+    function resetWater() {
+      appState.water.current = 0;
+      saveState();
+      updateWaterUI();
+    }
+
+    // --- JSON EXPORT / IMPORT ---
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "glowcare_backup_2026.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          appState = JSON.parse(e.target.result);
+          saveState();
+          initApp();
+          alert('Data imported successfully! ✨');
+        } catch(err) {
+          alert('Invalid JSON file format.');
+        }
+      };
+      reader.readAsText(event.target.files[0]);
+    }
+
+    // --- INITIALIZATION ---
+    function initApp() {
+      renderCalendar();
+      renderRecipes();
+      renderChores();
+      renderRoutines();
+      updateWaterUI();
+      document.getElementById('sleep-bed').value = appState.sleep.bed || '22:30';
+      document.getElementById('sleep-wake').value = appState.sleep.wake || '07:00';
+      calcSleep();
+    }
+
+    window.onload = initApp;
+  </script>
+</body>
+</html>
