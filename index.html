@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Aesthetic Life Companion</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans for Finch/Mindway typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              rose: '#FCE7F3',
+              roseDark: '#DB2777',
+              sage: '#DCFCE7',
+              sageDark: '#166534',
+              lavender: '#F3E8FF',
+              lavenderDark: '#7E22CE',
+              peach: '#FFEDD5',
+              peachDark: '#C2410C',
+              sky: '#E0F2FE',
+              skyDark: '#0369A1',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 99px; }
+
+    /* Glassmorphism & Micro-animations */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+    
+    .glass-card-dark {
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Finch-style Tactile Spring Feedback */
+    .tap-bounce {
+      transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.18s ease;
+    }
+    .tap-bounce:active {
+      transform: scale(0.95);
+    }
+
+    /* Water Animation */
+    @keyframes wave {
+      0% { transform: translateX(0) scaleY(1); }
+      50% { transform: translateX(-25%) scaleY(1.08); }
+      100% { transform: translateX(-50%) scaleY(1); }
+    }
+    .water-wave {
+      animation: wave 4s infinite linear;
+    }
+
+    /* Modal Slide Animation */
+    .modal-sheet {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-rose-50 via-purple-50 to-sky-50 text-slate-800 min-h-screen font-sans pb-28 antialiased selection:bg-rose-200">
+
+  <!-- TOP HEADER / THEME SELECTOR -->
+  <header class="sticky top-0 z-40 glass-card px-5 py-3.5 mb-5 shadow-xs flex justify-between items-center transition-all duration-300" id="mainHeader">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-400 to-rose-300 flex items-center justify-center text-white shadow-md shadow-rose-200 tap-bounce">
+        <i data-lucide="sparkles" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-tight">Daily Companion</h1>
+        <p class="text-xs font-medium text-slate-500" id="currentDateStr">Loading date...</p>
+      </div>
+    </div>
+
+    <!-- Background Wallpapers & Theme Switcher -->
+    <div class="flex items-center space-x-2">
+      <button onclick="toggleThemeModal()" class="w-9 h-9 rounded-xl bg-white/80 shadow-xs border border-slate-200/60 flex items-center justify-center text-slate-600 tap-bounce hover:bg-slate-100">
+        <i data-lucide="palette" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto px-4 space-y-6">
+
+    <!-- TAB NAVIGATOR -->
+    <nav class="flex p-1.5 space-x-1 glass-card rounded-2xl shadow-xs overflow-x-auto no-scrollbar" id="tabNav">
+      <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn flex-1 min-w-[70px] py-2 px-3 rounded-xl text-xs font-bold transition-all duration-200 text-rose-600 bg-white shadow-xs flex flex-col items-center gap-1">
+        <i data-lucide="layout-grid" class="w-4 h-4"></i> Overview
+      </button>
+      <button onclick="switchTab('period')" id="btn-period" class="tab-btn flex-1 min-w-[70px] py-2 px-3 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-800 transition-all duration-200 flex flex-col items-center gap-1">
+        <i data-lucide="calendar-heart" class="w-4 h-4"></i> Period
+      </button>
+      <button onclick="switchTab('care')" id="btn-care" class="tab-btn flex-1 min-w-[70px] py-2 px-3 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-800 transition-all duration-200 flex flex-col items-center gap-1">
+        <i data-lucide="heart-handshake" class="w-4 h-4"></i> Self-Care
+      </button>
+      <button onclick="switchTab('academics')" id="btn-academics" class="tab-btn flex-1 min-w-[70px] py-2 px-3 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-800 transition-all duration-200 flex flex-col items-center gap-1">
+        <i data-lucide="graduation-cap" class="w-4 h-4"></i> Study
+      </button>
+      <button onclick="switchTab('recipes')" id="btn-recipes" class="tab-btn flex-1 min-w-[70px] py-2 px-3 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-800 transition-all duration-200 flex flex-col items-center gap-1">
+        <i data-lucide="utensils" class="w-4 h-4"></i> Recipes
+      </button>
+    </nav>
+
+    <!-- SECTION 1: OVERVIEW & DAILY HEALTH TRACKERS (OtterLife Style) -->
+    <div id="tab-dashboard" class="tab-content space-y-5">
+      
+      <!-- Dynamic Water Tracker Card -->
+      <div class="glass-card rounded-3xl p-5 shadow-sm relative overflow-hidden border border-sky-100">
+        <div class="flex justify-between items-start mb-4 relative z-10">
+          <div class="flex items-center space-x-2">
+            <div class="p-2 rounded-xl bg-sky-100 text-sky-600">
+              <i data-lucide="droplets" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-slate-800 flex items-center gap-1.5">
+                Water Intake 
+                <button onclick="editItemPrompt('waterGoal')" class="text-slate-400 hover:text-sky-600"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+              </h2>
+              <p class="text-xs text-slate-500" id="waterStatsText">Target: 2500 ml</p>
+            </div>
+          </div>
+          <span class="text-xl font-extrabold text-sky-600" id="waterPercentageText">0%</span>
+        </div>
+
+        <!-- Animated Water Vessel -->
+        <div class="relative h-20 bg-sky-50 rounded-2xl overflow-hidden border border-sky-200/60 mb-4 flex items-center justify-center">
+          <div id="waterFill" class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-sky-400 to-sky-300 transition-all duration-700 ease-out" style="height: 0%;">
+            <div class="water-wave absolute top-0 left-0 w-[200%] h-3 bg-white/30"></div>
+          </div>
+          <span class="relative z-10 text-lg font-bold text-slate-700 drop-shadow-xs" id="waterAmountText">0 / 2500 ml</span>
+        </div>
+
+        <div class="flex space-x-2 relative z-10">
+          <button onclick="addWater(250)" class="flex-1 py-2.5 rounded-xl bg-white/80 hover:bg-sky-50 text-sky-700 font-bold text-xs border border-sky-200 shadow-2xs tap-bounce flex items-center justify-center gap-1">
+            +250 ml
+          </button>
+          <button onclick="addWater(500)" class="flex-1 py-2.5 rounded-xl bg-sky-500 text-white font-bold text-xs shadow-md shadow-sky-200 tap-bounce flex items-center justify-center gap-1">
+            +500 ml
+          </button>
+          <button onclick="resetWater()" class="px-3 rounded-xl bg-slate-100 text-slate-500 hover:text-rose-600 text-xs tap-bounce">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Macros & Micros Nutrition Tracker Card -->
+      <div class="glass-card rounded-3xl p-5 shadow-sm border border-orange-100">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center space-x-2">
+            <div class="p-2 rounded-xl bg-orange-100 text-orange-600">
+              <i data-lucide="apple" class="w-5 h-5"></i>
+            </div>
+            <h2 class="font-bold text-slate-800">Nutrition & Macros</h2>
+          </div>
+          <button onclick="openNutritionModal()" class="p-2 rounded-xl bg-orange-50 text-orange-600 hover:bg-orange-100 tap-bounce text-xs font-bold flex items-center gap-1">
+            <i data-lucide="plus" class="w-4 h-4"></i> Log
+          </button>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 text-center mb-4">
+          <div class="bg-white/60 p-2.5 rounded-2xl border border-orange-100">
+            <span class="text-xs text-slate-400 font-medium block">Calories</span>
+            <span class="text-sm font-bold text-slate-800" id="macroCal">0 / 2000</span>
+          </div>
+          <div class="bg-white/60 p-2.5 rounded-2xl border border-rose-100">
+            <span class="text-xs text-rose-400 font-medium block">Protein</span>
+            <span class="text-sm font-bold text-slate-800" id="macroProtein">0g</span>
+          </div>
+          <div class="bg-white/60 p-2.5 rounded-2xl border border-amber-100">
+            <span class="text-xs text-amber-500 font-medium block">Carbs</span>
+            <span class="text-sm font-bold text-slate-800" id="macroCarbs">0g</span>
+          </div>
+          <div class="bg-white/60 p-2.5 rounded-2xl border border-emerald-100">
+            <span class="text-xs text-emerald-500 font-medium block">Fats</span>
+            <span class="text-sm font-bold text-slate-800" id="macroFats">0g</span>
+          </div>
+        </div>
+
+        <div class="space-y-2" id="nutritionLogsList">
+          <!-- Dynamic logs appended here -->
+          <p class="text-xs text-center text-slate-400 py-1">No meals logged today</p>
+        </div>
+      </div>
+
+      <!-- Sleep & Workout Summary Cards (Side by Side) -->
+      <div class="grid grid-cols-2 gap-4">
+        
+        <!-- Sleep Tracker -->
+        <div class="glass-card rounded-3xl p-4 shadow-sm border border-purple-100">
+          <div class="flex justify-between items-center mb-3">
+            <div class="p-2 rounded-xl bg-purple-100 text-purple-600">
+              <i data-lucide="moon" class="w-4 h-4"></i>
+            </div>
+            <button onclick="editItemPrompt('sleep')" class="text-slate-400 hover:text-purple-600"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Sleep</h3>
+          <p class="text-xl font-extrabold text-slate-800 mt-1" id="sleepHoursText">7.5 hrs</p>
+          <span class="inline-block mt-2 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 text-[10px] font-bold" id="sleepQualityText">Quality: Restful ✨</span>
+        </div>
+
+        <!-- Workout Tracker -->
+        <div class="glass-card rounded-3xl p-4 shadow-sm border border-emerald-100">
+          <div class="flex justify-between items-center mb-3">
+            <div class="p-2 rounded-xl bg-emerald-100 text-emerald-600">
+              <i data-lucide="activity" class="w-4 h-4"></i>
+            </div>
+            <button onclick="openWorkoutModal()" class="text-slate-400 hover:text-emerald-600"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Workout</h3>
+          <p class="text-xl font-extrabold text-slate-800 mt-1" id="workoutSummaryText">30 mins</p>
+          <span class="inline-block mt-2 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold" id="workoutTypeText">Yoga & Stretch</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- SECTION 2: REDESIGNED PERIOD TRACKER & CALENDAR (Dayol Style) -->
+    <div id="tab-period" class="tab-content hidden space-y-5">
+      
+      <!-- Current Cycle Overview Card -->
+      <div class="glass-card rounded-3xl p-5 shadow-sm bg-gradient-to-br from-rose-50/80 to-pink-50/80 border border-rose-200/80">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center space-x-2">
+            <div class="p-2 rounded-2xl bg-rose-500 text-white shadow-md shadow-rose-200">
+              <i data-lucide="heart" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-slate-900">Cycle Overview</h2>
+              <p class="text-xs text-rose-600 font-semibold" id="cyclePhaseText">Phase: Follicular (Day 8)</p>
+            </div>
+          </div>
+          <button onclick="openPeriodLogModal()" class="px-3 py-1.5 rounded-xl bg-rose-500 text-white font-bold text-xs tap-bounce shadow-xs">
+            Log Today
+          </button>
+        </div>
+
+        <div class="bg-white/80 rounded-2xl p-4 border border-rose-100 flex justify-between items-center">
+          <div>
+            <span class="text-xs text-slate-400 font-medium block">Next Period In</span>
+            <span class="text-2xl font-black text-rose-500" id="daysToNextPeriod">20 Days</span>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400 font-medium block">Avg Cycle</span>
+            <span class="text-sm font-bold text-slate-700" id="avgCycleLenText">28 Days</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Proper Grid Calendar -->
+      <div class="glass-card rounded-3xl p-5 shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2" id="calendarMonthYear">August 2026</h3>
+          <div class="flex space-x-1">
+            <button onclick="changeMonth(-1)" class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 tap-bounce"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+            <button onclick="changeMonth(1)" class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 tap-bounce"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+          </div>
+        </div>
+
+        <!-- Days of Week Header -->
+        <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 mb-2">
+          <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+        </div>
+
+        <!-- Dynamic Days Grid -->
+        <div id="calendarGrid" class="grid grid-cols-7 gap-1"></div>
+      </div>
+
+      <!-- Science-Backed Tips Carousel (Mindway Style) -->
+      <div class="glass-card rounded-3xl p-5 shadow-sm border border-purple-100">
+        <div class="flex items-center space-x-2 mb-3">
+          <div class="p-1.5 rounded-lg bg-purple-100 text-purple-600">
+            <i data-lucide="lightbulb" class="w-4 h-4"></i>
+          </div>
+          <h3 class="font-bold text-slate-800 text-sm">Phase Science & Hacks</h3>
+        </div>
+        <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 text-xs leading-relaxed text-purple-900" id="cycleTipBox">
+          ✨ <strong>Follicular Phase Hack:</strong> Estrogen is rising! Energy levels peak during this time. Ideal window for high-intensity workouts and complex learning tasks.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECTION 3: PERSONAL CARE & HOME ROUTINES (Dayol List Style) -->
+    <div id="tab-care" class="tab-content hidden space-y-5">
+      
+      <!-- Category Header + Time-based Sub-tabs -->
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          Routines & Care
+        </h2>
+        <button onclick="addNewCareCategory()" class="p-2 rounded-xl bg-rose-50 text-rose-600 font-bold text-xs tap-bounce flex items-center gap-1">
+          <i data-lucide="plus" class="w-4 h-4"></i> Add Category
+        </button>
+      </div>
+
+      <!-- Time Interval Filters -->
+      <div class="flex space-x-2">
+        <button onclick="filterRoutine('daily')" id="rt-daily" class="rt-filter px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white tap-bounce">Daily</button>
+        <button onclick="filterRoutine('weekly')" id="rt-weekly" class="rt-filter px-4 py-1.5 rounded-full text-xs font-medium bg-white/70 text-slate-600 hover:bg-white tap-bounce">Weekly</button>
+        <button onclick="filterRoutine('monthly')" id="rt-monthly" class="rt-filter px-4 py-1.5 rounded-full text-xs font-medium bg-white/70 text-slate-600 hover:bg-white tap-bounce">Monthly</button>
+      </div>
+
+      <!-- Dynamic Care Categories List -->
+      <div class="space-y-4" id="careCategoriesContainer">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+
+    </div>
+
+    <!-- SECTION 4: COLLEGE STUDIES & BOOK READING LIBRARY -->
+    <div id="tab-academics" class="tab-content hidden space-y-5">
+      
+      <!-- College & Study Section -->
+      <div class="glass-card rounded-3xl p-5 shadow-sm border border-indigo-100">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center space-x-2">
+            <div class="p-2 rounded-xl bg-indigo-100 text-indigo-600">
+              <i data-lucide="book-open" class="w-5 h-5"></i>
+            </div>
+            <h2 class="font-bold text-slate-800">College & Exams</h2>
+          </div>
+          <button onclick="addSubjectPrompt()" class="p-1.5 rounded-xl bg-indigo-50 text-indigo-600 tap-bounce">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3" id="studySubjectsList">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Book Reading Library -->
+      <div class="glass-card rounded-3xl p-5 shadow-sm border border-amber-100">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center space-x-2">
+            <div class="p-2 rounded-xl bg-amber-100 text-amber-700">
+              <i data-lucide="bookmark" class="w-5 h-5"></i>
+            </div>
+            <h2 class="font-bold text-slate-800">Reading Books</h2>
+          </div>
+          <button onclick="addBookPrompt()" class="p-1.5 rounded-xl bg-amber-50 text-amber-700 tap-bounce">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3" id="booksList">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECTION 5: RECIPE BOOK & MEAL PLANNER -->
+    <div id="tab-recipes" class="tab-content hidden space-y-5">
+      <div class="flex justify-between items-center">
+        <h2 class="text-lg font-bold text-slate-900">Saved Recipes</h2>
+        <button onclick="openAddRecipeModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-xs tap-bounce flex items-center gap-1 shadow-xs">
+          <i data-lucide="plus" class="w-4 h-4"></i> Add Recipe
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4" id="recipesContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL / SLIDE SHEET CONTAINER FOR EDITING & LOGGING -->
+  <div id="modalOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-end justify-center transition-opacity duration-300">
+    <div class="modal-sheet w-full max-w-md bg-white rounded-t-3xl p-6 shadow-2xl transform translate-y-full max-h-[85vh] overflow-y-auto" id="modalContent">
+      <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-5"></div>
+      <div id="modalBody">
+        <!-- Dynamic content injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    // INITIAL APP STATE
+    let appState = {
+      water: { current: 1250, target: 2500 },
+      nutrition: {
+        caloriesTarget: 2000,
+        logs: [
+          { name: 'Oatmeal & Almonds', cal: 350, p: 12, c: 45, f: 8 },
+          { name: 'Paneer & Rice Bowl', cal: 520, p: 28, c: 50, f: 14 }
+        ]
+      },
+      sleep: { hours: 7.5, quality: 'Restful ✨' },
+      workout: { mins: 30, type: 'Yoga & Stretch' },
+      period: {
+        lastStartDate: '2026-08-22',
+        cycleLength: 28,
+        logs: {}
+      },
+      routines: {
+        daily: [
+          {
+            title: 'Skincare (AM)',
+            items: [
+              { name: 'Gentle Cleanser', done: true },
+              { name: 'Hydrating Toner', done: true },
+              { name: 'Ceramide Moisturizer', done: false },
+              { name: 'Sunscreen (SPF 50)', done: false }
+            ]
+          },
+          {
+            title: 'Home Care',
+            items: [
+              { name: 'Make Bed', done: true },
+              { name: 'Wipe Kitchen Counter', done: false }
+            ]
+          }
+        ],
+        weekly: [
+          {
+            title: 'Hair & Body Care',
+            items: [
+              { name: 'Hair Oiling Treatment', done: false },
+              { name: 'Body Exfoliation', done: false }
+            ]
+          }
+        ],
+        monthly: [
+          {
+            title: 'Deep Cleaning',
+            items: [
+              { name: 'Clean Fridge Shelves', done: false },
+              { name: 'Wipe Closet Mirrors', done: false }
+            ]
+          }
+        ]
+      },
+      academics: [
+        { name: 'Pharmaceutics', chapters: 'Chapter 4: Emulsions', progress: 65 },
+        { name: 'Pharmacognosy', chapters: 'Herbal Drugs Overview', progress: 40 }
+      ],
+      books: [
+        { title: 'Atomic Habits', readPages: 140, totalPages: 320, status: 'Reading' },
+        { title: 'Deep Work', readPages: 250, totalPages: 250, status: 'Completed' }
+      ],
+      recipes: [
+        {
+          name: 'High Protein Oats Podi',
+          cal: 380,
+          ingredients: 'Oats, Roasted Chana, Almonds, Flaxseed',
+          steps: '1. Dry roast seeds & oats.\n2. Grind to fine powder.\n3. Mix with warm milk.'
+        }
+      ]
+    };
+
+    let activeRoutineFilter = 'daily';
+    let calendarDate = new Date(2026, 7, 30); // Aug 30, 2026
+
+    // INITIALIZATION
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      updateDateDisplay();
+      renderWater();
+      renderNutrition();
+      renderCalendar();
+      renderRoutines();
+      renderAcademics();
+      renderBooks();
+      renderRecipes();
+      lucide.createIcons();
+    });
+
+    // LOCAL STORAGE HANDLING
+    function saveState() {
+      localStorage.setItem('aesthetic_app_data', JSON.stringify(appState));
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem('aesthetic_app_data');
+      if (saved) {
+        try { appState = JSON.parse(saved); } catch (e) {}
+      }
+    }
+
+    // DATE DISPLAY
+    function updateDateDisplay() {
+      const options = { weekday: 'short', month: 'short', day: 'numeric' };
+      document.getElementById('currentDateStr').innerText = new Date().toLocaleDateString('en-US', options);
+    }
+
+    // TAB SWITCHING
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('text-rose-600', 'bg-white', 'shadow-xs', 'font-bold');
+        btn.classList.add('text-slate-500', 'font-medium');
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`btn-${tabId}`);
+      activeBtn.classList.add('text-rose-600', 'bg-white', 'shadow-xs', 'font-bold');
+      activeBtn.classList.remove('text-slate-500', 'font-medium');
+    }
+
+    // WATER TRACKER LOGIC
+    function renderWater() {
+      const percent = Math.min(100, Math.round((appState.water.current / appState.water.target) * 100));
+      document.getElementById('waterFill').style.height = `${percent}%`;
+      document.getElementById('waterPercentageText').innerText = `${percent}%`;
+      document.getElementById('waterAmountText').innerText = `${appState.water.current} / ${appState.water.target} ml`;
+      document.getElementById('waterStatsText').innerText = `Target: ${appState.water.target} ml`;
+    }
+
+    function addWater(amount) {
+      appState.water.current += amount;
+      renderWater();
+      saveState();
+    }
+
+    function resetWater() {
+      appState.water.current = 0;
+      renderWater();
+      saveState();
+    }
+
+    // NUTRITION LOGIC
+    function renderNutrition() {
+      let totalCal = 0, totalP = 0, totalC = 0, totalF = 0;
+      const listContainer = document.getElementById('nutritionLogsList');
+      listContainer.innerHTML = '';
+
+      appState.nutrition.logs.forEach((log, idx) => {
+        totalCal += log.cal;
+        totalP += log.p;
+        totalC += log.c;
+        totalF += log.f;
+
+        const item = document.createElement('div');
+        item.className = 'flex justify-between items-center text-xs p-2.5 rounded-xl bg-white/70 border border-slate-100';
+        item.innerHTML = `
+          <div>
+            <span class="font-bold text-slate-800">${log.name}</span>
+            <span class="text-slate-400 block">${log.cal} kcal • P:${log.p}g C:${log.c}g F:${log.f}g</span>
+          </div>
+          <button onclick="deleteNutrition(${idx})" class="text-slate-300 hover:text-rose-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+        `;
+        listContainer.appendChild(item);
+      });
+
+      if (appState.nutrition.logs.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-center text-slate-400 py-1">No meals logged today</p>`;
+      }
+
+      document.getElementById('macroCal').innerText = `${totalCal} / ${appState.nutrition.caloriesTarget}`;
+      document.getElementById('macroProtein').innerText = `${totalP}g`;
+      document.getElementById('macroCarbs').innerText = `${totalC}g`;
+      document.getElementById('macroFats').innerText = `${totalF}g`;
+      lucide.createIcons();
+    }
+
+    function deleteNutrition(idx) {
+      appState.nutrition.logs.splice(idx, 1);
+      renderNutrition();
+      saveState();
+    }
+
+    function openNutritionModal() {
+      showModal(`
+        <h3 class="text-lg font-bold text-slate-900 mb-4">Log Meal</h3>
+        <div class="space-y-3">
+          <input id="mealName" type="text" placeholder="Meal Name" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-rose-500" />
+          <div class="grid grid-cols-2 gap-2">
+            <input id="mealCal" type="number" placeholder="Calories (kcal)" class="p-3 rounded-xl border border-slate-200 text-sm focus:outline-rose-500" />
+            <input id="mealP" type="number" placeholder="Protein (g)" class="p-3 rounded-xl border border-slate-200 text-sm focus:outline-rose-500" />
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <input id="mealC" type="number" placeholder="Carbs (g)" class="p-3 rounded-xl border border-slate-200 text-sm focus:outline-rose-500" />
+            <input id="mealF" type="number" placeholder="Fats (g)" class="p-3 rounded-xl border border-slate-200 text-sm focus:outline-rose-500" />
+          </div>
+          <button onclick="saveMealLog()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-sm tap-bounce mt-2">Save Meal</button>
+        </div>
+      `);
+    }
+
+    function saveMealLog() {
+      const name = document.getElementById('mealName').value || 'Meal';
+      const cal = parseInt(document.getElementById('mealCal').value) || 0;
+      const p = parseInt(document.getElementById('mealP').value) || 0;
+      const c = parseInt(document.getElementById('mealC').value) || 0;
+      const f = parseInt(document.getElementById('mealF').value) || 0;
+
+      appState.nutrition.logs.push({ name, cal, p, c, f });
+      renderNutrition();
+      saveState();
+      closeModal();
+    }
+
+    // PERIOD & CALENDAR MODULE LOGIC
+    function renderCalendar() {
+      const year = calendarDate.getFullYear();
+      const month = calendarDate.getMonth();
+
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year}`;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < firstDay; i++) {
+        grid.appendChild(document.createElement('div'));
+      }
+
+      const today = new Date();
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement('button');
+        cell.className = 'h-9 w-full rounded-xl flex flex-col items-center justify-center text-xs font-semibold relative tap-bounce transition-all';
+
+        const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+        
+        if (isToday) {
+          cell.classList.add('bg-rose-500', 'text-white', 'shadow-sm', 'shadow-rose-200');
+        } else {
+          cell.classList.add('hover:bg-rose-50', 'text-slate-700');
+        }
+
+        cell.innerText = day;
+        cell.onclick = () => openPeriodDayModal(year, month, day);
+        grid.appendChild(cell);
+      }
+    }
+
+    function changeMonth(delta) {
+      calendarDate.setMonth(calendarDate.getMonth() + delta);
+      renderCalendar();
+    }
+
+    function openPeriodLogModal() {
+      showModal(`
+        <h3 class="text-lg font-bold text-slate-900 mb-2">Log Period Flow</h3>
+        <p class="text-xs text-slate-500 mb-4">Record today's symptoms and flow intensity</p>
+        <div class="space-y-3">
+          <label class="text-xs font-bold text-slate-700 block">Flow Intensity</label>
+          <select id="flowInput" class="w-full p-3 rounded-xl border border-slate-200 text-sm">
+            <option>Light</option>
+            <option>Medium</option>
+            <option>Heavy</option>
+            <option>Spotting</option>
+          </select>
+
+          <label class="text-xs font-bold text-slate-700 block mt-2">Symptoms</label>
+          <input id="symptomInput" type="text" placeholder="Mild cramps, fatigue, etc." class="w-full p-3 rounded-xl border border-slate-200 text-sm" />
+
+          <button onclick="closeModal()" class="w-full py-3 bg-rose-500 text-white font-bold rounded-xl text-sm tap-bounce shadow-md shadow-rose-200 mt-2">Save Today's Log</button>
+        </div>
+      `);
+    }
+
+    function openPeriodDayModal(y, m, d) {
+      showModal(`
+        <h3 class="text-lg font-bold text-slate-900 mb-1">${m + 1}/${d}/${y} Details</h3>
+        <p class="text-xs text-slate-500 mb-4">Cycle & Symptom Record</p>
+        <div class="p-4 bg-rose-50 rounded-2xl border border-rose-100 mb-4 text-xs space-y-1">
+          <p><strong>Status:</strong> Normal Cycle Day</p>
+          <p><strong>Logged Flow:</strong> None recorded</p>
+        </div>
+        <button onclick="closeModal()" class="w-full py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs">Close</button>
+      `);
+    }
+
+    // ROUTINES & SELF CARE LOGIC
+    function filterRoutine(type) {
+      activeRoutineFilter = type;
+      document.querySelectorAll('.rt-filter').forEach(btn => {
+        btn.classList.remove('bg-slate-900', 'text-white');
+        btn.classList.add('bg-white/70', 'text-slate-600');
+      });
+      document.getElementById(`rt-${type}`).classList.add('bg-slate-900', 'text-white');
+      document.getElementById(`rt-${type}`).classList.remove('bg-white/70', 'text-slate-600');
+      renderRoutines();
+    }
+
+    function renderRoutines() {
+      const container = document.getElementById('careCategoriesContainer');
+      container.innerHTML = '';
+
+      const categories = appState.routines[activeRoutineFilter] || [];
+
+      categories.forEach((cat, catIdx) => {
+        const catCard = document.createElement('div');
+        catCard.className = 'glass-card rounded-3xl p-5 shadow-sm space-y-3';
+        
+        let itemsHTML = '';
+        cat.items.forEach((item, itemIdx) => {
+          itemsHTML += `
+            <div class="flex items-center justify-between p-2.5 rounded-2xl bg-white/70 border border-slate-100">
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleRoutineItem('${catIdx}', '${itemIdx}')" class="w-4 h-4 rounded-md text-rose-500 focus:ring-0">
+                <span class="text-xs font-semibold ${item.done ? 'line-through text-slate-400' : 'text-slate-800'}">${item.name}</span>
+              </label>
+              <button onclick="editRoutineItemPrompt('${catIdx}', '${itemIdx}')" class="text-slate-300 hover:text-slate-600"><i data-lucide="pencil" class="w-3 h-3"></i></button>
+            </div>
+          `;
+        });
+
+        catCard.innerHTML = `
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              ${cat.title}
+              <button onclick="editCategoryTitlePrompt('${catIdx}')" class="text-slate-300 hover:text-slate-600"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+            </h3>
+            <button onclick="addRoutineItemPrompt('${catIdx}')" class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-xl tap-bounce">+ Item</button>
+          </div>
+          <div class="space-y-2">
+            ${itemsHTML}
+          </div>
+        `;
+        container.appendChild(catCard);
+      });
+      lucide.createIcons();
+    }
+
+    function toggleRoutineItem(catIdx, itemIdx) {
+      appState.routines[activeRoutineFilter][catIdx].items[itemIdx].done = !appState.routines[activeRoutineFilter][catIdx].items[itemIdx].done;
+      renderRoutines();
+      saveState();
+    }
+
+    function addRoutineItemPrompt(catIdx) {
+      const name = prompt('Enter item name:');
+      if (name) {
+        appState.routines[activeRoutineFilter][catIdx].items.push({ name, done: false });
+        renderRoutines();
+        saveState();
+      }
+    }
+
+    function editRoutineItemPrompt(catIdx, itemIdx) {
+      const current = appState.routines[activeRoutineFilter][catIdx].items[itemIdx].name;
+      const updated = prompt('Rename item:', current);
+      if (updated !== null) {
+        if (updated === '') {
+          appState.routines[activeRoutineFilter][catIdx].items.splice(itemIdx, 1);
+        } else {
+          appState.routines[activeRoutineFilter][catIdx].items[itemIdx].name = updated;
+        }
+        renderRoutines();
+        saveState();
+      }
+    }
+
+    function editCategoryTitlePrompt(catIdx) {
+      const current = appState.routines[activeRoutineFilter][catIdx].title;
+      const updated = prompt('Rename Category:', current);
+      if (updated) {
+        appState.routines[activeRoutineFilter][catIdx].title = updated;
+        renderRoutines();
+        saveState();
+      }
+    }
+
+    function addNewCareCategory() {
+      const title = prompt('Enter new category title:');
+      if (title) {
+        appState.routines[activeRoutineFilter].push({ title, items: [] });
+        renderRoutines();
+        saveState();
+      }
+    }
+
+    // ACADEMICS & STUDY LOGIC
+    function renderAcademics() {
+      const container = document.getElementById('studySubjectsList');
+      container.innerHTML = '';
+
+      appState.academics.forEach((sub, idx) => {
+        const card = document.createElement('div');
+        card.className = 'p-3.5 rounded-2xl bg-white/70 border border-slate-100 space-y-2';
+        card.innerHTML = `
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-xs text-slate-800">${sub.name}</h4>
+            <button onclick="editSubjectPrompt(${idx})" class="text-slate-300 hover:text-slate-600"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <p class="text-[11px] text-slate-500">${sub.chapters}</p>
+          <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-indigo-500 h-1.5 rounded-full" style="width: ${sub.progress}%"></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function addSubjectPrompt() {
+      const name = prompt('Subject Name:');
+      const chapters = prompt('Current Chapter / Topic:');
+      if (name) {
+        appState.academics.push({ name, chapters: chapters || 'General Notes', progress: 0 });
+        renderAcademics();
+        saveState();
+      }
+    }
+
+    function editSubjectPrompt(idx) {
+      const current = appState.academics[idx];
+      const prog = prompt(`Update Progress % for ${current.name}:`, current.progress);
+      if (prog !== null) {
+        appState.academics[idx].progress = Math.min(100, Math.max(0, parseInt(prog) || 0));
+        renderAcademics();
+        saveState();
+      }
+    }
+
+    // READING BOOKS LOGIC
+    function renderBooks() {
+      const container = document.getElementById('booksList');
+      container.innerHTML = '';
+
+      appState.books.forEach((book, idx) => {
+        const percent = Math.min(100, Math.round((book.readPages / book.totalPages) * 100));
+        const card = document.createElement('div');
+        card.className = 'p-3.5 rounded-2xl bg-white/70 border border-slate-100 space-y-2';
+        card.innerHTML = `
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-xs text-slate-800">${book.title}</h4>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">${book.status}</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px] text-slate-500">
+            <span>Progress: ${book.readPages} / ${book.totalPages} pages</span>
+            <button onclick="updateBookPages(${idx})" class="text-amber-700 font-bold hover:underline">Update</button>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-amber-500 h-1.5 rounded-full" style="width: ${percent}%"></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function addBookPrompt() {
+      const title = prompt('Book Title:');
+      const totalPages = prompt('Total Pages:');
+      if (title && totalPages) {
+        appState.books.push({ title, readPages: 0, totalPages: parseInt(totalPages) || 100, status: 'Reading' });
+        renderBooks();
+        saveState();
+      }
+    }
+
+    function updateBookPages(idx) {
+      const current = appState.books[idx];
+      const pages = prompt(`Pages read for ${current.title}:`, current.readPages);
+      if (pages !== null) {
+        appState.books[idx].readPages = Math.min(current.totalPages, parseInt(pages) || 0);
+        if (appState.books[idx].readPages === current.totalPages) {
+          appState.books[idx].status = 'Completed';
+        }
+        renderBooks();
+        saveState();
+      }
+    }
+
+    // RECIPES LOGIC
+    function renderRecipes() {
+      const container = document.getElementById('recipesContainer');
+      container.innerHTML = '';
+
+      appState.recipes.forEach((rec, idx) => {
+        const card = document.createElement('div');
+        card.className = 'glass-card rounded-3xl p-5 shadow-sm space-y-3';
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm">${rec.name}</h3>
+              <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md inline-block mt-1">${rec.cal} kcal per serving</span>
+            </div>
+            <button onclick="deleteRecipe(${idx})" class="text-slate-300 hover:text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </div>
+          <div class="text-xs text-slate-600 space-y-1 bg-white/60 p-3 rounded-2xl border border-slate-100">
+            <p><strong>Ingredients:</strong> ${rec.ingredients}</p>
+            <p class="mt-1 whitespace-pre-line"><strong>Steps:</strong> ${rec.steps}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function openAddRecipeModal() {
+      showModal(`
+        <h3 class="text-lg font-bold text-slate-900 mb-4">Add Recipe</h3>
+        <div class="space-y-3">
+          <input id="recName" type="text" placeholder="Recipe Title" class="w-full p-3 rounded-xl border border-slate-200 text-sm" />
+          <input id="recCal" type="number" placeholder="Calories per serving" class="w-full p-3 rounded-xl border border-slate-200 text-sm" />
+          <input id="recIng" type="text" placeholder="Ingredients (comma separated)" class="w-full p-3 rounded-xl border border-slate-200 text-sm" />
+          <textarea id="recSteps" placeholder="Step-by-step instructions" class="w-full p-3 rounded-xl border border-slate-200 text-sm h-24"></textarea>
+          <button onclick="saveRecipe()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-sm tap-bounce">Save Recipe</button>
+        </div>
+      `);
+    }
+
+    function saveRecipe() {
+      const name = document.getElementById('recName').value || 'Recipe';
+      const cal = parseInt(document.getElementById('recCal').value) || 0;
+      const ingredients = document.getElementById('recIng').value || '';
+      const steps = document.getElementById('recSteps').value || '';
+
+      appState.recipes.push({ name, cal, ingredients, steps });
+      renderRecipes();
+      saveState();
+      closeModal();
+    }
+
+    function deleteRecipe(idx) {
+      appState.recipes.splice(idx, 1);
+      renderRecipes();
+      saveState();
+    }
+
+    // MODAL UTILITIES
+    function showModal(contentHTML) {
+      const overlay = document.getElementById('modalOverlay');
+      const sheet = document.getElementById('modalContent');
+      document.getElementById('modalBody').innerHTML = contentHTML;
+
+      overlay.classList.remove('hidden');
+      setTimeout(() => {
+        sheet.classList.remove('translate-y-full');
+      }, 10);
+    }
+
+    function closeModal() {
+      const overlay = document.getElementById('modalOverlay');
+      const sheet = document.getElementById('modalContent');
+      sheet.classList.add('translate-y-full');
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+      }, 300);
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'modalOverlay') closeModal();
+    });
+
+    // GENERAL EDIT PROMPT HELPERS
+    function editItemPrompt(type) {
+      if (type === 'waterGoal') {
+        const val = prompt('Set daily water goal (ml):', appState.water.target);
+        if (val) {
+          appState.water.target = parseInt(val) || 2500;
+          renderWater();
+          saveState();
+        }
+      } else if (type === 'sleep') {
+        const val = prompt('Hours slept:', appState.sleep.hours);
+        if (val) {
+          appState.sleep.hours = parseFloat(val) || 7.5;
+          document.getElementById('sleepHoursText').innerText = `${appState.sleep.hours} hrs`;
+          saveState();
+        }
+      }
+    }
+
+    function openWorkoutModal() {
+      const type = prompt('Workout Type:', appState.workout.type);
+      const mins = prompt('Duration (mins):', appState.workout.mins);
+      if (type && mins) {
+        appState.workout.type = type;
+        appState.workout.mins = parseInt(mins) || 30;
+        document.getElementById('workoutSummaryText').innerText = `${appState.workout.mins} mins`;
+        document.getElementById('workoutTypeText').innerText = appState.workout.type;
+        saveState();
+      }
+    }
+
+    function toggleThemeModal() {
+      showModal(`
+        <h3 class="text-lg font-bold text-slate-900 mb-3">App Wallpaper & Theme</h3>
+        <p class="text-xs text-slate-500 mb-4">Select soft background tint</p>
+        <div class="grid grid-cols-3 gap-3">
+          <button onclick="setTheme('rose')" class="p-4 rounded-2xl bg-rose-100 border border-rose-300 text-xs font-bold text-rose-800 tap-bounce">Rose Pastel</button>
+          <button onclick="setTheme('sky')" class="p-4 rounded-2xl bg-sky-100 border border-sky-300 text-xs font-bold text-sky-800 tap-bounce">Sky Glass</button>
+          <button onclick="setTheme('lavender')" class="p-4 rounded-2xl bg-purple-100 border border-purple-300 text-xs font-bold text-purple-800 tap-bounce">Lavender</button>
+        </div>
+      `);
+    }
+
+    function setTheme(theme) {
+      const body = document.body;
+      body.className = "min-h-screen font-sans pb-28 antialiased selection:bg-rose-200 ";
+      if (theme === 'rose') body.classList.add('bg-gradient-to-br', 'from-rose-50', 'via-purple-50', 'to-sky-50', 'text-slate-800');
+      if (theme === 'sky') body.classList.add('bg-gradient-to-br', 'from-sky-50', 'via-indigo-50', 'to-cyan-50', 'text-slate-800');
+      if (theme === 'lavender') body.classList.add('bg-gradient-to-br', 'from-purple-50', 'via-pink-50', 'to-slate-50', 'text-slate-800');
+      closeModal();
+    }
+  </script>
+</body>
+</html>
