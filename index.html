@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cycle & Harmony</title>
+
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkN5Y2xlICYgSGFybW9ueSIsCiAgInNob3J0X25hbWUiOiAiSGFybW9ueSIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI0Y3RjlGQiIsCiAgInRoZW1lX2NvbG9yIjogIiM4MUIxOUEiCiB9">
+  <meta name="theme-color" content="#81B29A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Harmony">
+
+  <style>
+    :root {
+      --phase-menstrual: #9E2A2B;
+      --phase-menstrual-bg: #FDF0F0;
+      --phase-follicular: #E07A5F;
+      --phase-follicular-bg: #FDF2EE;
+      --phase-ovulatory: #D4A373;
+      --phase-ovulatory-bg: #FAF5EF;
+      --phase-luteal: #57886C;
+      --phase-luteal-bg: #EAF4EE;
+      
+      --active-accent: var(--phase-luteal);
+      --active-bg: var(--phase-luteal-bg);
+      
+      --text-main: #2B2D42;
+      --text-muted: #6C757D;
+      --card-bg: #FFFFFF;
+      --border-light: #E9ECEF;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      background-color: #F7F9FB;
+      color: var(--text-main);
+      padding-bottom: 80px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top App Header */
+    .app-header {
+      padding: 16px 20px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .app-header h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .date-badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: #F1F3F5;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* Main View Area */
+    .view {
+      display: none;
+      padding: 16px;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .view.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Dynamic Phase Hero Banner */
+    .phase-hero {
+      background: var(--active-bg);
+      border-left: 5px solid var(--active-accent);
+      padding: 20px;
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+    }
+
+    .phase-hero .tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--active-accent);
+      margin-bottom: 6px;
+    }
+
+    .phase-hero h2 {
+      font-size: 1.35rem;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .phase-hero p {
+      font-size: 0.88rem;
+      color: #495057;
+      line-height: 1.45;
+    }
+
+    /* Standard Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    /* Controls & Inputs */
+    .cycle-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .control-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .control-group label {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .control-group input {
+      padding: 8px 12px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    /* Seed Cycling Item List */
+    .seed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .seed-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: #F8F9FA;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .seed-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--active-accent);
+    }
+
+    .seed-details strong {
+      display: block;
+      font-size: 0.9rem;
+    }
+
+    .seed-details span {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Nutrient Pillars Grid */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .pillar-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--border-light);
+      background: #FFFFFF;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pillar-chip.selected {
+      background: var(--active-bg);
+      border-color: var(--active-accent);
+      color: var(--active-accent);
+      font-weight: 600;
+    }
+
+    /* Water Tracker Grid */
+    .water-grid {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .water-cup {
+      width: 36px;
+      height: 44px;
+      border: 2px solid var(--border-light);
+      border-radius: 6px 6px 12px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      opacity: 0.35;
+      transition: all 0.2s ease;
+    }
+
+    .water-cup.filled {
+      opacity: 1;
+      border-color: #4EA8DE;
+      background: #E0F2FE;
+    }
+
+    /* Symptom Pills */
+    .symptom-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag-btn {
+      padding: 8px 14px;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      background: #FFFFFF;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .tag-btn.active {
+      background: var(--active-accent);
+      color: #FFFFFF;
+      border-color: var(--active-accent);
+    }
+
+    /* Bottom Tab Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      height: 64px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab-item .icon {
+      font-size: 1.3rem;
+    }
+
+    .tab-item.active {
+      color: var(--active-accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <h1>Cycle & Harmony</h1>
+      <span class="date-badge" id="currentDateDisplay">Today</span>
+    </header>
+
+    <!-- Tab 1: Today Overview & Symptoms -->
+    <main id="tab-today" class="view active">
+      <section class="phase-hero" id="phaseHero">
+        <div class="tag" id="phaseTag">Calculating...</div>
+        <h2 id="phaseTitle">Loading Cycle Status</h2>
+        <p id="phaseDesc">Checking your cycle parameters...</p>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span>🩸</span> Cycle Settings</div>
+        <div class="card-subtitle">Adjust your parameters to sync phases accurately</div>
+        <div class="cycle-controls">
+          <div class="control-group">
+            <label for="startDate">Last Period Start:</label>
+            <input type="date" id="startDate" />
+          </div>
+          <div class="control-group">
+            <label for="cycleLength">Cycle Length (Days):</label>
+            <input type="number" id="cycleLength" value="28" min="20" max="45" />
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span>📝</span> Quick Symptom Check</div>
+        <div class="card-subtitle">Tap what you are experiencing today</div>
+        <div class="symptom-tags">
+          <button class="tag-btn" onclick="toggleTag(this)">Cramps</button>
+          <button class="tag-btn" onclick="toggleTag(this)">Bloating</button>
+          <button class="tag-btn" onclick="toggleTag(this)">High Energy</button>
+          <button class="tag-btn" onclick="toggleTag(this)">Low Energy</button>
+          <button class="tag-btn" onclick="toggleTag(this)">Acne</button>
+          <button class="tag-btn" onclick="toggleTag(this)">Calm</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Tab 2: Nutrition & Seed Cycling -->
+    <main id="tab-nutrition" class="view">
+      <section class="card">
+        <div class="card-title"><span>🌱</span> Seed Cycling Protocol</div>
+        <div class="card-subtitle" id="seedPhaseSubtitle">Phase Blend</div>
+        
+        <div class="seed-list" id="seedListContainer">
+          <!-- Dynamically populated based on phase -->
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span>🥗</span> Phase Nutrient Pillars</div>
+        <div class="card-subtitle">Foods matched to your current hormone state</div>
+        <div class="pillars-grid" id="pillarsContainer">
+          <!-- Dynamically populated based on phase -->
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span>💧</span> Hydration Counter</div>
+        <div class="card-subtitle">Aim for 8 glasses daily</div>
+        <div class="water-grid" id="waterGrid">
+          <div class="water-cup" onclick="toggleWater(0)">💧</div>
+          <div class="water-cup" onclick="toggleWater(1)">💧</div>
+          <div class="water-cup" onclick="toggleWater(2)">💧</div>
+          <div class="water-cup" onclick="toggleWater(3)">💧</div>
+          <div class="water-cup" onclick="toggleWater(4)">💧</div>
+          <div class="water-cup" onclick="toggleWater(5)">💧</div>
+          <div class="water-cup" onclick="toggleWater(6)">💧</div>
+          <div class="water-cup" onclick="toggleWater(7)">💧</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="tab-bar">
+      <button class="tab-item active" onclick="switchTab('today', this)">
+        <span class="icon">🌸</span>
+        <span>Today</span>
+      </button>
+      <button class="tab-item" onclick="switchTab('nutrition', this)">
+        <span class="icon">🥑</span>
+        <span>Nutrition</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <script>
+    /* ==========================================================
+       1. CYCLE PHASE ENGINE & CONFIG
+       ========================================================== */
+    const PHASE_DATA = {
+      menstrual: {
+        name: "Menstrual Phase",
+        color: "var(--phase-menstrual)",
+        bg: "var(--phase-menstrual-bg)",
+        title: "Rest, Warmth & Renewal",
+        desc: "Progesterone and estrogen are at their lowest. Focus on rest, hydration, and iron replacement.",
+        seedsSubtitle: "Phase 1 Blend (Days 1–14)",
+        seeds: [
+          { name: "1 tbsp Ground Flaxseed", desc: "Contains lignans to bind excess estrogen" },
+          { name: "1 tbsp Pumpkin Seeds", desc: "Rich in zinc to support progesterone synthesis" }
+        ],
+        pillars: ["🍵 Warm Teas", "🥩 Iron Foods", "🫐 Antioxidants", "🥔 Root Veggies"]
+      },
+      follicular: {
+        name: "Follicular Phase",
+        color: "var(--phase-follicular)",
+        bg: "var(--phase-follicular-bg)",
+        title: "Energy Rising & Growth",
+        desc: "Estrogen is increasing. Focus on light, vibrant foods, fermented vegetables, and lean protein.",
+        seedsSubtitle: "Phase 1 Blend (Days 1–14)",
+        seeds: [
+          { name: "1 tbsp Ground Flaxseed", desc: "Lignans for smooth estrogen balance" },
+          { name: "1 tbsp Pumpkin Seeds", desc: "Zinc & fatty acids for follicle health" }
+        ],
+        pillars: ["🥦 Fermented Veg", "🥗 Vibrant Greens", "🍗 Light Protein", "🥑 Healthy Fats"]
+      },
+      ovulatory: {
+        name: "Ovulatory Phase",
+        color: "var(--phase-ovulatory)",
+        bg: "var(--phase-ovulatory-bg)",
+        title: "Peak Energy & Stamina",
+        desc: "Estrogen peaks. High energy! Prioritize fiber to clear out excess hormone metabolites.",
+        seedsSubtitle: "Phase 1 Blend (Days 1–14)",
+        seeds: [
+          { name: "1 tbsp Ground Flaxseed", desc: "Binds peak estrogen levels" },
+          { name: "1 tbsp Pumpkin Seeds", desc: "Prepares body for progesterone transition" }
+        ],
+        pillars: ["🍓 Fresh Berries", "🌾 Fiber Boost", "🥬 Raw Salads", "🥥 Anti-Inflammatory"]
+      },
+      luteal: {
+        name: "Luteal Phase",
+        color: "var(--phase-luteal)",
+        bg: "var(--phase-luteal-bg)",
+        title: "Nourish & Stabilize",
+        desc: "Progesterone dominates. Focus on complex carbohydrates and B-vitamins to prevent cravings.",
+        seedsSubtitle: "Phase 2 Blend (Days 15–28)",
+        seeds: [
+          { name: "1 tbsp Sesame Seeds", desc: "Blocks excess estrogen buildup" },
+          { name: "1 tbsp Sunflower Seeds", desc: "Rich in Vitamin E & Selenium for progesterone" }
+        ],
+        pillars: ["🍠 Complex Carbs", "🍫 Magnesium / Cocoa", "🥑 Healthy Fats", "🍵 Herbal Teas"]
+      }
+    };
+
+    // State
+    let userCycle = {
+      startDate: new Date(Date.now() - 12 * 86400000).toISOString().split('T')[0], // Default 12 days ago
+      cycleLength: 28
+    };
+
+    /* ==========================================================
+       2. CALCULATIONS & UI UPDATES
+       ========================================================== */
+    function updateCycleEngine() {
+      const start = new Date(document.getElementById('startDate').value);
+      const length = parseInt(document.getElementById('cycleLength').value) || 28;
+      const today = new Date();
+
+      // Calculate Day of Cycle
+      const diffTime = Math.abs(today - start);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const currentCycleDay = (diffDays % length) + 1;
+
+      // Determine Phase
+      let currentPhaseKey = 'follicular';
+      if (currentCycleDay <= 5) {
+        currentPhaseKey = 'menstrual';
+      } else if (currentCycleDay <= 12) {
+        currentPhaseKey = 'follicular';
+      } else if (currentCycleDay <= 16) {
+        currentPhaseKey = 'ovulatory';
+      } else {
+        currentPhaseKey = 'luteal';
+      }
+
+      const phase = PHASE_DATA[currentPhaseKey];
+
+      // Update Root Theme Colors
+      document.documentElement.style.setProperty('--active-accent', phase.color);
+      document.documentElement.style.setProperty('--active-bg', phase.bg);
+
+      // Render Hero Banner
+      document.getElementById('phaseTag').innerText = `Day ${currentCycleDay} • ${phase.name}`;
+      document.getElementById('phaseTitle').innerText = phase.title;
+      document.getElementById('phaseDesc').innerText = phase.desc;
+
+      // Render Seed Cycling Section
+      document.getElementById('seedPhaseSubtitle').innerText = phase.seedsSubtitle;
+      const seedListContainer = document.getElementById('seedListContainer');
+      seedListContainer.innerHTML = phase.seeds.map(s => `
+        <label class="seed-item">
+          <input type="checkbox" />
+          <div class="seed-details">
+            <strong>${s.name}</strong>
+            <span>${s.desc}</span>
+          </div>
+        </label>
+      `).join('');
+
+      // Render Nutrient Pillars Section
+      const pillarsContainer = document.getElementById('pillarsContainer');
+      pillarsContainer.innerHTML = phase.pillars.map(p => `
+        <button class="pillar-chip" onclick="togglePillar(this)">
+          ${p}
+        </button>
+      `).join('');
+    }
+
+    /* ==========================================================
+       3. INTERACTION HANDLERS
+       ========================================================== */
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function toggleTag(btn) {
+      btn.classList.toggle('active');
+    }
+
+    function togglePillar(btn) {
+      btn.classList.toggle('selected');
+    }
+
+    function toggleWater(index) {
+      const cups = document.querySelectorAll('.water-cup');
+      cups.forEach((cup, i) => {
+        if (i <= index) {
+          cup.classList.add('filled');
+        } else {
+          cup.classList.remove('filled');
+        }
+      });
+    }
+
+    // Initialize Page
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('startDate').value = userCycle.startDate;
+      document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      
+      document.getElementById('startDate').addEventListener('change', updateCycleEngine);
+      document.getElementById('cycleLength').addEventListener('input', updateCycleEngine);
+
+      updateCycleEngine();
+    });
+
+    /* ==========================================================
+       4. PWA SERVICE WORKER INJECTION (Inline Blob method)
+       ========================================================== */
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE = "harmony-pwa-v1";
+        self.addEventListener("install", e => {
+          e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./"])));
+        });
+        self.addEventListener("fetch", e => {
+          e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+        });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      
+      navigator.serviceWorker.register(swUrl)
+        .then(() => console.log('Service Worker Active'))
+        .catch(err => console.log('Service Worker Setup:', err));
+    }
+  </script>
+</body>
+</html>
